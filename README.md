@@ -14,3 +14,12 @@ In this project I trained Conventional, Unet and GAN autoencoder networks on dep
 ### Denoised Frames
 
 ![foxdemo](https://github.com/nohayassin/RealSense-ML/blob/master/GAN/3D%20denoised-%20100%20epochs%20-%20strides%20200%20-%20erosion%202%20-%20Binary%20-%20NO%20IR.gif)
+
+## Installation
+
+Use the package manager [pip](https://pip.pypa.io/en/stable/) to install Keras and Tensorflow.
+
+```bash
+pip install tensorflow-gpu
+pip install keras
+```
