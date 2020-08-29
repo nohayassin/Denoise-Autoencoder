@@ -8,8 +8,8 @@ In this project I trained Conventional, Unet and GAN autoencoder networks on dep
 
 ## 3D Ground Truth Frames
 
-![foxdemo](https://github.com/nohayassin/RealSense-ML/blob/master/3D%20pure%20-%20100%20epochs%20-%20strides%20200%20-%20erosion%202%20-%20Binary%20-%20NO%20IR.gif)
+![foxdemo](https://github.com/nohayassin/RealSense-ML/blob/master/GAN/3D%20pure-%20100%20epochs%20-%20strides%20200%20-%20erosion%202%20-%20Binary%20-%20NO%20IR.gif)
 
 ## 3D Denoised Frames
 
-![foxdemo](https://github.com/nohayassin/RealSense-ML/blob/master/3D%20denoised-%20100%20epochs%20-%20strides%20200%20-%20erosion%202%20-%20Binary%20-%20NO%20IR.gif)
+![foxdemo](https://github.com/nohayassin/RealSense-ML/blob/master/GAN/3D%20denoised-%20100%20epochs%20-%20strides%20200%20-%20erosion%202%20-%20Binary%20-%20NO%20IR.gif)
