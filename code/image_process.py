@@ -138,7 +138,7 @@ class SplitImage:
         image = cv2.imread(file, cv2.IMREAD_UNCHANGED)
         return image
 
-    def image_to_array(self, iteration, images_num_to_process, cropped_w, cropped_h, cropped_images, ir_images , channels , cropped_image_offsets):
+    def image_to_array(self, iteration, images_num_to_process, cropped_w, cropped_h, cropped_images, ir_images , channels , cropped_image_offsets=[]):
         im_files = []
         ir_im_files = []
         ls = os.listdir(cropped_images)

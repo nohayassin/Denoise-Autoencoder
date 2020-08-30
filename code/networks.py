@@ -6,19 +6,18 @@ import configurations
 
 
 class Network:
-    def __init__(self, model):
-        self.__model = model
+    def __init__(self, train_config):
+        self.train_config = train_config
 
     def get(self):
-        if self.__model == configurations.BASIC:
-            return Basic()
-        if self.__model == configurations.UNET:
-            return Unet(pretrained_weights=None, input_size=(configurations.img_width, configurations.img_height, configurations.channels))
-        if self.__model == configurations.CCGAN:
+        if self.train_config.MODEL == self.train_config.BASIC:
+            return Basic(self.train_config)
+        if self.train_config.MODEL == self.train_config.UNET:
+            return Unet(pretrained_weights=None, input_size=(self.train_config.img_width, self.train_config.img_height, self.train_config.channels))
+        if self.train_config.MODEL == self.train_config.CCGAN:
             return CCGAN()
-        if self.__model == configurations.CONV:
-            return ConvAutoencoder.build(configurations.img_width, configurations.img_height, configurations.channels, filters=(16, 32, 64))
-        return self.basic_model()
+        if self.train_config.MODEL == self.train_config.CONV:
+            return ConvAutoencoder.build(self.train_config.img_width, self.train_config.img_height, self.train_config.channels, filters=(16, 32, 64))
 
 
     def ccgan_model(self):

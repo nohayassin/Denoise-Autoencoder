@@ -1,6 +1,11 @@
 
 class NetworkConfig:
     def __init__(self, train=0, test=0, statistics=0, network_type=0):
+
+        self.images_path = r"C:\Users\user\Documents\ML\images"
+        self.models_path = r"C:\Users\user\Documents\ML\models"
+        self.logs_path = r"C:\Users\user\Documents\ML\logs"
+
         # models
         self.BASIC = 0
         self.UNET = 1
@@ -27,24 +32,27 @@ class NetworkConfig:
         self.img_width, self.img_height = 128, 128  # 64, 64 ##256, 256 #512, 512
         self.EROSION_ITERATIONS = 1
 
-class TrainConfig:
-    def __init__(self):
+class TrainConfig(NetworkConfig):
+    def __init__(self, train=0, test=0, statistics=0, network_type=0):
+        NetworkConfig.__init__(self, train, test, statistics, network_type)
         self.origin_files_index_size_path_pure = {}
         self.origin_files_index_size_path_noisy = {}
         self.origin_files_index_size_path_ir = {}
 
-        self.load_model_name = r"C:\Users\user\Documents\ML\models\DEPTH_20200810-153235.model_new_new"
+        self.load_model_name = self.models_path + r"\DEPTH_20200810-153235.model_new_new"
 
-        self.imgdir_pure = r"./images/train/pure"  # "./images/train/masked_pure"
-        self.imgdir_noisy = "./images/train/noisy"
-        self.imgdir_ir = "./images/train/ir"
-        self.savedir_pure = "./images/cropped_images/pure"
-        self.savedir_noisy = "./images/cropped_images/noisy"
-        self.cropped_train_images_ir = "./images/cropped_images/ir"
-        self.masked_pure = r"./images/train/masked_pure"
-        self.masked_noisy = r"./images/train/masked_noisy"
-        self.cropped_train_images_pure = "./images/cropped_images/pure"
-        self.cropped_train_images_noisy = "./images/cropped_images/noisy"
+        self.imgdir_pure = self.images_path + r"/train/pure"  # "./images/train/masked_pure"
+        self.imgdir_noisy = self.images_path + "/train/noisy"
+        self.imgdir_ir = self.images_path + "/train/ir"
+        self.savedir_pure = self.images_path + "./cropped_images/pure"
+        self.savedir_noisy = self.images_path + "./cropped_images/noisy"
+        self.cropped_train_images_ir = self.images_path + "./cropped_images/ir"
+        self.masked_pure = self.images_path + r"./train/masked_pure"
+        self.masked_noisy = self.images_path + r"./train/masked_noisy"
+        self.cropped_train_images_pure = self.images_path + "./cropped_images/pure"
+        self.cropped_train_images_noisy = self.images_path + "./cropped_images/noisy"
+
+
 
     def get_mask_pure_inputs(self):
         return self.imgdir_pure, self.imgdir_noisy, self.masked_pure

@@ -242,8 +242,3 @@ class CCGAN():
 
         save(self.generator, "ccgan_generator")
         save(self.discriminator, "ccgan_discriminator")
-
-
-#if __name__ == '__main__':
-#    ccgan = CCGAN()
-#    ccgan.train(epochs=20000, batch_size=32, sample_interval=200)

@@ -23,14 +23,14 @@ batch_size = 50 #20
 
 class Basic:
 
-    def __init__(self, channels=1):
+    def __init__(self, train_config):
 
-        self.channels = channels
+        self.train_config = train_config
 
     def compile(self):
         model = Sequential()
-        conv_size = (5, 5) #(7, 7)  # (3,3) #  #(3,3) #(5, 5)  # (5,5) #(3,3)
-        input_shape = (configurations.img_width, configurations.img_height, configurations.channels)
+        conv_size = (5, 5)
+        input_shape = (self.train_config.img_width, self.train_config.img_height, self.train_config.channels)
         model.add(Conv2D(64, kernel_size=conv_size, kernel_constraint=max_norm(max_norm_value), activation='relu',
                          kernel_initializer='he_uniform', input_shape=input_shape))
         model.add(Conv2D(32, kernel_size=conv_size, kernel_constraint=max_norm(max_norm_value), activation='relu',
@@ -52,7 +52,7 @@ class Basic:
             Conv2DTranspose(64, kernel_size=conv_size, kernel_constraint=max_norm(max_norm_value), activation='relu',
                             kernel_initializer='he_uniform'))
         model.add(
-            Conv2D(configurations.channels, kernel_size=conv_size, kernel_constraint=max_norm(max_norm_value),
+            Conv2D(self.train_config.channels, kernel_size=conv_size, kernel_constraint=max_norm(max_norm_value),
                    activation='sigmoid',
                    padding='same'))
 
