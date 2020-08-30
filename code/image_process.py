@@ -188,7 +188,8 @@ class SplitImage:
         img = img / 56535
         return img
 
-    def image_to_array_test(self, cropped_images, ir_images, cropped_image_offsets, channels, cropped_w, cropped_h ):
+    def image_to_array_test(self, cropped_images, ir_images, cropped_image_offsets, vars ):
+        cropped_w, cropped_h, channels = vars
         im_files = []
         ir_im_files = []
         for fname in os.listdir(cropped_images):

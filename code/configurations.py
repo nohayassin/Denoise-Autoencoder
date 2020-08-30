@@ -33,8 +33,8 @@ class NetworkConfig:
         self.EROSION_ITERATIONS = 1
 
 class TrainConfig(NetworkConfig):
-    def __init__(self, train=0, test=0, statistics=0, network_type=0):
-        NetworkConfig.__init__(self, train, test, statistics, network_type)
+    def __init__(self, network_config):
+        NetworkConfig.__init__(self, network_config.TRAIN_DATA, network_config.TEST_DATA, network_config.DIFF_DATA, network_config.MODEL)
         self.origin_files_index_size_path_pure = {}
         self.origin_files_index_size_path_noisy = {}
         self.origin_files_index_size_path_ir = {}
@@ -71,24 +71,26 @@ class TrainConfig(NetworkConfig):
         if type == "noisy":
             return self.img_width, self.img_height, self.cropped_train_images_noisy, self.cropped_train_images_ir, self.channels
 
-class TestConfig:
-    def __init__(self):
+class TestConfig(NetworkConfig):
+    def __init__(self, network_config):
+        NetworkConfig.__init__(self, network_config.TRAIN_DATA, network_config.TEST_DATA, network_config.DIFF_DATA,
+                               network_config.MODEL)
         self.origin_files_index_size_path_test = {}
         self.test_img_width, self.test_img_height = 480, 480
 
         self.test_model_name = r"C:\Users\user\Documents\ML\models\DEPTH_20200828-124309.model"
 
-        self.imgdir = r"./images/tests/depth"
-        self.realDataDir = r".\images\real_scenes_png"
-        self.ir_imgdir = r"./images/tests/ir"
-        self.denoised_dir = r"./images/denoised"
-        self.cropped_images = r"./images/cropped_tests/depth"
-        self.ir_cropped_images = r"./images/cropped_tests/ir"
-        self.denoised_dir = r"./images/denoised"
-        self.normalized_dir = r"./images/normalized"
+        self.imgdir = self.images_path + r"\tests\depth"
+        self.realDataDir = self.images_path + r"\real_scenes_png"
+        self.ir_imgdir = self.images_path + r"\tests\ir"
+        self.denoised_dir = self.images_path + r"\denoised"
+        self.cropped_images = self.images_path + r"\cropped_tests\depth"
+        self.ir_cropped_images = self.images_path + r"\cropped_tests\ir"
+        self.denoised_dir = self.images_path + r"\denoised"
+        self.normalized_dir = self.images_path + r"\normalized"
 
-        self.pngdir = r".\images\real_scenes_raw"
-        self.pngoutdir = r".\images\real_scenes_png"
+        self.pngdir = self.images_path + r"\real_scenes_raw"
+        self.pngoutdir = self.images_path + r"\real_scenes_png"
 
     def get_test_data_inputs(self, image_set="test"):
         if image_set == "ir":
@@ -99,15 +101,15 @@ class TestConfig:
     def get_image_to_array_test_input(self):
         return self.test_img_width, self.test_img_height, self.channels
 
-class StatisticsConfig:
-    def __init__(self):
-        self.diff_denoised_path = r".\images\diff_compare\diff_denoised"
-        self.diff_tested_path = r".\images\diff_compare\diff_tested"
-        self.colored_diff_denoised_path = r".\images\diff_compare\colored_diff_denoised"
-        self.colored_diff_tested_path = r".\images\diff_compare\colored_diff_tested"
-        self.diff_log_path = r".\images\diff_compare\logs"
-        self.denoised_path = r".\images\denoised"
-        self.tested_path = r".\images\tests\depth"
-        #pure_path = r".\images\tests\pure"
-        self.pure_path = r"c:\users\user\documents\ml\images\train\masked_pure"
+class StatisticsConfig(TestConfig):
+    def __init__(self, network_config):
+        TestConfig.__init__(self, network_config)
+        self.diff_denoised_path = self.images_path + r"\diff_compare\diff_denoised"
+        self.diff_tested_path = self.images_path + r"\diff_compare\diff_tested"
+        self.colored_diff_denoised_path = self.images_path + r"\diff_compare\colored_diff_denoised"
+        self.colored_diff_tested_path = self.images_path + r"\diff_compare\colored_diff_tested"
+        self.diff_log_path = self.images_path + r"\diff_compare\logs"
+        self.denoised_path = self.images_path + r"\denoised"
+        self.tested_path = self.images_path + r"\tests\depth"
+        self.pure_path = self.images_path + r"\train\masked_pure"
 
