@@ -41,16 +41,16 @@ class TrainConfig(NetworkConfig):
 
         self.load_model_name = self.models_path + r"\DEPTH_20200810-153235.model_new_new"
 
-        self.imgdir_pure = self.images_path + r"/train/pure"  # "./images/train/masked_pure"
-        self.imgdir_noisy = self.images_path + "/train/noisy"
-        self.imgdir_ir = self.images_path + "/train/ir"
-        self.savedir_pure = self.images_path + "./cropped_images/pure"
-        self.savedir_noisy = self.images_path + "./cropped_images/noisy"
-        self.cropped_train_images_ir = self.images_path + "./cropped_images/ir"
-        self.masked_pure = self.images_path + r"./train/masked_pure"
-        self.masked_noisy = self.images_path + r"./train/masked_noisy"
-        self.cropped_train_images_pure = self.images_path + "./cropped_images/pure"
-        self.cropped_train_images_noisy = self.images_path + "./cropped_images/noisy"
+        self.imgdir_pure = self.images_path + r"\train\pure"  # "./images/train/masked_pure"
+        self.imgdir_noisy = self.images_path + r"\train\noisy"
+        self.imgdir_ir = self.images_path + r"\train\ir"
+        self.savedir_pure = self.images_path + r"\cropped_images\pure"
+        self.savedir_noisy = self.images_path + r"/cropped_images/noisy"
+        self.cropped_train_images_ir = self.images_path + r"\cropped_images\ir"
+        self.masked_pure = self.images_path + r"\train\masked_pure"
+        self.masked_noisy = self.images_path + r"\train\masked_noisy"
+        self.cropped_train_images_pure = self.images_path + r".\cropped_images\pure"
+        self.cropped_train_images_noisy = self.images_path + r"\cropped_images\noisy"
 
 
 

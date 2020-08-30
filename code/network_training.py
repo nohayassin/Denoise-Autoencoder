@@ -12,10 +12,8 @@ class NetworkTraining:
         self.network = Network(train_config)
 
     def load_to_arrays(self, iteration = 0, images_num_to_process = 1):
-        img_width, img_height, cropped_train_images_pure, cropped_train_images_ir, channels = self.train_config.get_image_to_array_train_input("pure")
-        pure_input_train = self.image_config.image_to_array(iteration, images_num_to_process, img_width, img_height, cropped_train_images_pure, cropped_train_images_ir, channels)
-        img_width, img_height, cropped_train_images_noisy, cropped_train_images_ir, channels = self.train_config.get_image_to_array_train_input("noisy")
-        noisy_input_train = self.image_config.image_to_array(iteration, images_num_to_process, img_width, img_height, cropped_train_images_noisy, cropped_train_images_ir, channels)
+        pure_input_train = self.image_config.image_to_array(iteration, images_num_to_process, self.train_config.get_image_to_array_train_input("pure"))
+        noisy_input_train = self.image_config.image_to_array(iteration, images_num_to_process, self.train_config.get_image_to_array_train_input("noisy"))
         return pure_input_train, noisy_input_train
 
     def train(self):
