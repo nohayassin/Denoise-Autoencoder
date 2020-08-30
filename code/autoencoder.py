@@ -10,9 +10,9 @@ from network_training import NetworkTraining
 from configurations import *
 import convert_to_png
 
-def autoencoder(network_type):
+def autoencoder(network_type, train, test, statistics):
     # convert_to_png.raw_to_png(paths.pngDir, paths.pngOutDir, 1280, 720)
-    network_config = NetworkConfig(train=1, test=0, statistics=0, network_type=network_type)
+    network_config = NetworkConfig(train=train, test=test, statistics=statistics, network_type=network_type)
     train_config = TrainConfig(network_config)
     test_config = TestConfig(network_config)
     statistics_config = StatisticsConfig(network_config)
@@ -46,5 +46,10 @@ if __name__ == '__main__':
     BASIC = 0
     UNET = 1
     CCGAN = 2
-    autoencoder(UNET)
+
+    train = 0
+    test = 1
+    statistics = 0
+
+    autoencoder(UNET, train, test, statistics)
 

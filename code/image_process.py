@@ -12,8 +12,6 @@ class SplitImage:
         self.test_config = test_config
 
     def clean_directory(self, folder):
-        # empty delete all files before creating cropped images
-        #folder = savedir
         for filename in os.listdir(folder):
             file_path = os.path.join(folder, filename)
             try:
@@ -32,22 +30,16 @@ class SplitImage:
         normalizedImg[np.where(img == 0)] = 0
         normalized_dir = r"./images/normalized"
         normalized_outfile = normalized_dir + '/'  + 'normalized-' + img_path.split('-')[1]
-
         cv2.imwrite(normalized_outfile, normalizedImg)
 
     def mask_pure_images(self,pure_images_dir, noisy_images_dir, masked_pure):
         self.clean_directory(masked_pure)
         self.clean_directory(self.train_config.masked_noisy)
-
-        #purefilelist = [f for f in glob.glob(pure_images_dir + "**/*.png", recursive=True)]
         purefilelist = [f for f in glob.glob(pure_images_dir + "**/*" + self.network_config.IMAGE_EXTENSION, recursive=True)]
         purefilelist.sort()
-
-        #noisyfilelist = [f for f in glob.glob(noisy_images_dir + "**/*.png", recursive=True)]
         noisyfilelist = [f for f in glob.glob(noisy_images_dir + "**/*" + self.network_config.IMAGE_EXTENSION, recursive=True)]
         noisyfilelist.sort()
 
-        #EXTENSION = '.png'
         for i,f in enumerate(purefilelist):
             if f.endswith(self.network_config.IMAGE_EXTENSION):
                 name = os.path.basename(f)
@@ -106,7 +98,6 @@ class SplitImage:
                     frame_num += 1
             rolling_frame_num += frame_num
             origin_files_index_size_path[i] =  (rolling_frame_num, width, height, file)
-
         #return rolling_frame_num
 
 
