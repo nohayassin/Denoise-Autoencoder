@@ -5,7 +5,7 @@ from keras.callbacks import ModelCheckpoint, LearningRateScheduler
 from keras import backend as keras
 
 #Unet
-unet_steps_per_epoch = 200
+unet_steps_per_epoch = 300
 unet_epochs = 50 #100
 
 class Unet:

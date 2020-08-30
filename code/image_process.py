@@ -32,7 +32,8 @@ class SplitImage:
         normalized_outfile = normalized_dir + '/'  + 'normalized-' + img_path.split('-')[1]
         cv2.imwrite(normalized_outfile, normalizedImg)
 
-    def mask_pure_images(self,pure_images_dir, noisy_images_dir, masked_pure):
+    def mask_pure_images(self, vars):
+        pure_images_dir, noisy_images_dir, masked_pure = vars
         self.clean_directory(masked_pure)
         self.clean_directory(self.train_config.masked_noisy)
         purefilelist = [f for f in glob.glob(pure_images_dir + "**/*" + self.network_config.IMAGE_EXTENSION, recursive=True)]
@@ -79,7 +80,10 @@ class SplitImage:
                 #cv2.imshow('PURE MASKED', pure_img)
                 io2.imsave(path, pure_img)
 
-    def get_split_img(self, imgdir, savedir, cropped_w=28, cropped_h=28, origin_files_index_size_path={}):
+    def get_split_img(self, vars, is_ir):
+        #imgdir, savedir, cropped_w = 28, cropped_h = 28, origin_files_index_size_path = {} = vars
+        imgdir, savedir, cropped_w, cropped_h, origin_files_index_size_path = vars
+
         self.clean_directory(savedir)
         filelist = [f for f in glob.glob(imgdir + "**/*" + self.network_config.IMAGE_EXTENSION, recursive=True)]
         w, h = (cropped_w, cropped_h)
@@ -87,7 +91,14 @@ class SplitImage:
         for i, file in enumerate(filelist):
             name = os.path.basename(file)
             name = os.path.splitext(name)[0]
-            img = Image.fromarray(np.array(Image.open(file)).astype("uint16"))
+
+            if is_ir:
+                ii = cv2.imread(file)
+                gray_image = cv2.cvtColor(ii, cv2.COLOR_BGR2GRAY)
+                img = Image.fromarray(np.array(gray_image).astype("uint16"))
+            else:
+                img = Image.fromarray(np.array(Image.open(file)).astype("uint16"))
+
             width, height = img.size
             frame_num = 0
             for col_i in range(0, width, w):

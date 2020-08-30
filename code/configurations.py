@@ -17,7 +17,7 @@ class NetworkConfig:
         self.DIFF_DATA = statistics
         self.TEST_DATA = test and (1 - self.TRAIN_DATA) and (1 - self.DIFF_DATA)
 
-        self.MASK_PURE_DATA = 0 and self.TRAIN_DATA
+        self.MASK_PURE_DATA = 1 and self.TRAIN_DATA
         self.REMOVE_BACKGROUND = 0 and self.MASK_PURE_DATA
         self.NORMALIZE = 0 and self.MASK_PURE_DATA
         self.CROP_DATA = (0 or self.MASK_PURE_DATA) and self.TRAIN_DATA
@@ -45,7 +45,7 @@ class TrainConfig(NetworkConfig):
         self.imgdir_noisy = self.images_path + r"\train\noisy"
         self.imgdir_ir = self.images_path + r"\train\ir"
         self.savedir_pure = self.images_path + r"\cropped_images\pure"
-        self.savedir_noisy = self.images_path + r"/cropped_images/noisy"
+        self.savedir_noisy = self.images_path + r"\cropped_images\noisy"
         self.cropped_train_images_ir = self.images_path + r"\cropped_images\ir"
         self.masked_pure = self.images_path + r"\train\masked_pure"
         self.masked_noisy = self.images_path + r"\train\masked_noisy"
