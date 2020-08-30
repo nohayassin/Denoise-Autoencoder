@@ -28,9 +28,10 @@ def autoencoder(network_type, train, test, statistics):
 
     if network_config.CROP_DATA:
         print('Cropping training data ..')
-        image_processing.get_split_img(train_config.get_train_data_inputs("pure"))
-        image_processing.get_split_img(train_config.get_train_data_inputs("noisy"))
-        image_processing.get_split_img(train_config.get_train_data_inputs("ir"))
+        image_processing.get_split_img(train_config.get_train_data_inputs("ir"), True)
+        image_processing.get_split_img(train_config.get_train_data_inputs("pure"), False)
+        image_processing.get_split_img(train_config.get_train_data_inputs("noisy"), False)
+
 
     if network_config.TRAIN_DATA:
         network_train.train()
@@ -47,8 +48,8 @@ if __name__ == '__main__':
     UNET = 1
     CCGAN = 2
 
-    train = 0
-    test = 1
+    train = 1
+    test = 0
     statistics = 0
 
     autoencoder(UNET, train, test, statistics)
