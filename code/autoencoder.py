@@ -12,7 +12,7 @@ import convert_to_png
 
 def autoencoder(network_type):
     # convert_to_png.raw_to_png(paths.pngDir, paths.pngOutDir, 1280, 720)
-    network_config = NetworkConfig(train=0, test=1, statistics=0, network_type=network_type)
+    network_config = NetworkConfig(train=1, test=0, statistics=0, network_type=network_type)
     train_config = TrainConfig(network_config)
     test_config = TestConfig(network_config)
     statistics_config = StatisticsConfig(network_config)
