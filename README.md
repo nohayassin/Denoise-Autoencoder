@@ -25,59 +25,39 @@ pip install tensorflow-gpu
 pip install keras
 ```
 
-## Files Tree
+## Files Tree of Images Directory
 ```bash
 .
-├── images
-│   ├── cropped_images
-│   │   ├── ir
-│   │   │   └── images [500 entries, not opening dir]
-│   │   ├── noisy
-│   │   │   └── images [500 entries, not opening dir]
-│   │   └── pure
-│   │    └── images [500 entries, not opening dir]
-│   ├── cropped_tests
-│   │   ├── ir
-│   │   │   └── images [500 entries, not opening dir]
-│   │   └── depth
-│   │    └── images [500 entries, not opening dir]
-│   ├── denoised
-│   │   └── images [500 entries, not opening dir]
-│   ├── diff_compare
-│   │   ├── colored_diff_denoised
-│   │   │   └── images [30 entries, not opening dir]
-│   │   ├── colored_diff_tested
-│   │   │   └── images [30 entries, not opening dir]
-│   │   ├── diff_denoised
-│   │   │   └── images [30 entries, not opening dir]
-│   │   ├── diff_tested
-│   │   │   └── images [30 entries, not opening dir]
-│   │   └── logs
-│   │    └── txt files 
-│   ├── normalized
-│   │   └── images [500 entries, not opening dir]
-│   ├── real_scenes_raw
-│   │   └── images [*.raw files, not opening dir]
-│   ├── real_scenes_png
-│   │   └── images [*.png files, not opening dir]
-│   ├── tests
-│   │   ├── ir
-│   │   │   └── images [500 entries, not opening dir]
-│   │   ├── depth
-│   │   │   └── images [500 entries, not opening dir]
-│   │   ├── masked_depth
-│   │   │   └── images [500 entries, not opening dir]
-│   │   └── pure
-│   │    └── images [500 entries, not opening dir]
-└── └── train
-        ├── ir
-        │   └── images [500 entries, not opening dir]
-        ├── pure
-        │   └── images [500 entries, not opening dir]
-        ├── noisy
-        │   └── images [500 entries, not opening dir]
-        └── masked_pure
-           └── images [500 entries, not opening dir]
+├───cropped_images
+│   ├───ir
+│   ├───noisy
+│   └───pure
+├───cropped_tests
+│   ├───depth
+│   │   └───res-*
+│   └───ir
+│       └───left-*
+├───denoised
+├───diff_compare
+│   ├───colored_diff_denoised
+│   ├───colored_diff_tested
+│   ├───diff_denoised
+│   ├───diff_tested
+│   └───logs
+├───normalized
+├───real_scenes_png
+├───real_scenes_raw
+├───tests
+│   ├───depth
+│   ├───ir
+│   ├───masked depth
+│   └───pure
+└───train
+    ├───ir
+    ├───masked_noisy
+    ├───masked_pure
+    ├───noisy
+    └───pure
 ```
 
 ## Contributing
