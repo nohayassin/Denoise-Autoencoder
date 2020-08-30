@@ -25,9 +25,6 @@ pip install tensorflow-gpu
 pip install keras
 ```
 
-## Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
 ## Files Tree
 ```bash
 .
@@ -72,13 +69,16 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 │   │   │   └── images [500 entries, not opening dir]
 │   │   └── pure
 │   │    └── images [500 entries, not opening dir]
-│   └── train
-│   │   ├── ir
-│   │   │   └── images [500 entries, not opening dir]
-│   │   ├── pure
-│   │   │   └── images [500 entries, not opening dir]
-│   │   ├── noisy
-│   │   │   └── images [500 entries, not opening dir]
-│   │   └── masked_pure
-│   │    └── images [500 entries, not opening dir]
+└── └── train
+        ├── ir
+        │   └── images [500 entries, not opening dir]
+        ├── pure
+        │   └── images [500 entries, not opening dir]
+        ├── noisy
+        │   └── images [500 entries, not opening dir]
+        └── masked_pure
+           └── images [500 entries, not opening dir]
 ```
+
+## Contributing
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
