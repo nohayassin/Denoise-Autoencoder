@@ -31,44 +31,54 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 ## Files Tree
 ```bash
 .
-├── data
-│   ├── class_10_train
-│   │   ├── n01882714
-│   │   │   ├── images [500 entries exceeds filelimit, not opening dir]
-│   │   │   └── n01882714_boxes.txt
-│   │   ├── n02165456
-│   │   │   ├── images [500 entries exceeds filelimit, not opening dir]
-│   │   │   └── n02165456_boxes.txt
-│   │   ├── n02509815
-│   │   │   ├── images [500 entries exceeds filelimit, not opening dir]
-│   │   │   └── n02509815_boxes.txt
-│   │   ├── n03662601
-│   │   │   ├── images [500 entries exceeds filelimit, not opening dir]
-│   │   │   └── n03662601_boxes.txt
-│   │   ├── n04146614
-│   │   │   ├── images [500 entries exceeds filelimit, not opening dir]
-│   │   │   └── n04146614_boxes.txt
-│   │   ├── n04285008
-│   │   │   ├── images [500 entries exceeds filelimit, not opening dir]
-│   │   │   └── n04285008_boxes.txt
-│   │   ├── n07720875
-│   │   │   ├── images [500 entries exceeds filelimit, not opening dir]
-│   │   │   └── n07720875_boxes.txt
-│   │   ├── n07747607
-│   │   │   ├── images [500 entries exceeds filelimit, not opening dir]
-│   │   │   └── n07747607_boxes.txt
-│   │   ├── n07873807
-│   │   │   ├── images [500 entries exceeds filelimit, not opening dir]
-│   │   │   └── n07873807_boxes.txt
-│   │   └── n07920052
-│   │       ├── images [500 entries exceeds filelimit, not opening dir]
-│   │       └── n07920052_boxes.txt
-│   ├── class_10_val
-│   │   ├── test_images [250 entries exceeds filelimit, not opening dir]
-│   │   └── val_images [250 entries exceeds filelimit, not opening dir]
-│   ├── class_dict_10.json
-│   └── val_class_dict_10.json
-├── data.zip
-├── environment.yaml
-└── tiny-vgg.py
+├── images
+│   ├── cropped_images
+│   │   ├── ir
+│   │   │   └── images [500 entries, not opening dir]
+│   │   ├── noisy
+│   │   │   └── images [500 entries, not opening dir]
+│   │   └── pure
+│   │    └── images [500 entries, not opening dir]
+│   ├── cropped_tests
+│   │   ├── ir
+│   │   │   └── images [500 entries, not opening dir]
+│   │   └── depth
+│   │    └── images [500 entries, not opening dir]
+│   ├── denoised
+│   │   └── images [500 entries, not opening dir]
+│   ├── diff_compare
+│   │   ├── colored_diff_denoised
+│   │   │   └── images [30 entries, not opening dir]
+│   │   ├── colored_diff_tested
+│   │   │   └── images [30 entries, not opening dir]
+│   │   ├── diff_denoised
+│   │   │   └── images [30 entries, not opening dir]
+│   │   ├── diff_tested
+│   │   │   └── images [30 entries, not opening dir]
+│   │   └── logs
+│   │    └── txt files 
+│   ├── normalized
+│   │   └── images [500 entries, not opening dir]
+│   ├── real_scenes_raw
+│   │   └── images [*.raw files, not opening dir]
+│   ├── real_scenes_png
+│   │   └── images [*.png files, not opening dir]
+│   ├── tests
+│   │   ├── ir
+│   │   │   └── images [500 entries, not opening dir]
+│   │   ├── depth
+│   │   │   └── images [500 entries, not opening dir]
+│   │   ├── masked_depth
+│   │   │   └── images [500 entries, not opening dir]
+│   │   └── pure
+│   │    └── images [500 entries, not opening dir]
+│   └── train
+│   │   ├── ir
+│   │   │   └── images [500 entries, not opening dir]
+│   │   ├── pure
+│   │   │   └── images [500 entries, not opening dir]
+│   │   ├── noisy
+│   │   │   └── images [500 entries, not opening dir]
+│   │   └── masked_pure
+│   │    └── images [500 entries, not opening dir]
 ```
