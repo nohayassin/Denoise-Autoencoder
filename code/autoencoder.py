@@ -24,10 +24,11 @@ def autoencoder(network_type, train, test, statistics):
 
     if network_config.MASK_PURE_DATA:
         image_processing.mask_pure_images(train_config.get_mask_pure_inputs())
-        network_config.imgdir_pure = network_config.masked_pure
+        train_config.imgdir_pure = train_config.masked_pure
 
     if network_config.CROP_DATA:
         print('Cropping training data ..')
+        #train_config.imgdir_pure = train_config.masked_pure
         image_processing.get_split_img(train_config.get_train_data_inputs("ir"), True)
         image_processing.get_split_img(train_config.get_train_data_inputs("pure"), False)
         image_processing.get_split_img(train_config.get_train_data_inputs("noisy"), False)

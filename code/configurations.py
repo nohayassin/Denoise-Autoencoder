@@ -17,12 +17,12 @@ class NetworkConfig:
         self.DIFF_DATA = statistics
         self.TEST_DATA = test and (1 - self.TRAIN_DATA) and (1 - self.DIFF_DATA)
 
-        self.MASK_PURE_DATA = 1 and self.TRAIN_DATA
+        self.MASK_PURE_DATA = 0 and self.TRAIN_DATA
         self.REMOVE_BACKGROUND = 0 and self.MASK_PURE_DATA
         self.NORMALIZE = 0 and self.MASK_PURE_DATA
-        self.CROP_DATA = (0 or self.MASK_PURE_DATA) and self.TRAIN_DATA
+        self.CROP_DATA = (1 or self.MASK_PURE_DATA) and self.TRAIN_DATA
         self.TEST_REAL_DATA = 0 and self.TEST_DATA
-        self.LOAD_TRAINED_MODEL = 0 and self.TRAIN_DATA
+        self.LOAD_TRAINED_MODEL = 1 and self.TRAIN_DATA
         self.OUTPUT_EQUALS_INPUT = 0 and self.TRAIN_DATA
         self.REMOVE_IR = 0 and self.TRAIN_DATA  # not relevant for now
         self.IMAGE_EXTENSION = '.png'  # '.tif'#
@@ -39,9 +39,9 @@ class TrainConfig(NetworkConfig):
         self.origin_files_index_size_path_noisy = {}
         self.origin_files_index_size_path_ir = {}
 
-        self.load_model_name = self.models_path + r"\DEPTH_20200810-153235.model_new_new"
+        self.load_model_name = self.models_path + r"C:\Users\user\Documents\ML\models\DEPTH_20200831-082249.model"
 
-        self.imgdir_pure = self.images_path + r"\train\pure"  # "./images/train/masked_pure"
+        self.imgdir_pure = self.images_path + r"\train\pure"
         self.imgdir_noisy = self.images_path + r"\train\noisy"
         self.imgdir_ir = self.images_path + r"\train\ir"
         self.savedir_pure = self.images_path + r"\cropped_images\pure"
@@ -78,7 +78,7 @@ class TestConfig(NetworkConfig):
         self.origin_files_index_size_path_test = {}
         self.test_img_width, self.test_img_height = 480, 480
 
-        self.test_model_name = r"C:\Users\user\Documents\ML\models\DEPTH_20200828-124309.model"
+        self.test_model_name = r"C:\Users\user\Documents\ML\models\DEPTH_20200831-082249.model"
 
         self.imgdir = self.images_path + r"\tests\depth"
         self.realDataDir = self.images_path + r"\real_scenes_png"
