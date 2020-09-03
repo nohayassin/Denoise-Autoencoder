@@ -34,13 +34,13 @@ class NetworkTesting:
         ir_total_cropped_images = [0]*len(ir_filelist)
         for i,f in enumerate(ir_filelist) :
             cropped_images, test_img_width, test_img_height, origin_files_index_size_path_test = self.test_config.get_test_data_inputs("ir")
-            ir_total_cropped_images[i] = self.image_config.get_test_split_img(f, i, cropped_images, test_img_width, test_img_height, origin_files_index_size_path_test)
+            ir_total_cropped_images[i] = self.image_config.get_test_split_img(f, i, cropped_images, test_img_width, test_img_height, True, origin_files_index_size_path_test)
 
         for i,f in enumerate(filelist) :
             if self.test_config.NORMALIZE:
                 self.image_config.normalize_images(f)
             cropped_images, test_img_width, test_img_height, origin_files_index_size_path_test = self.test_config.get_test_data_inputs("test")
-            total_cropped_images[i] = self.image_config.get_test_split_img(f, i, cropped_images, test_img_width, test_img_height, origin_files_index_size_path_test)
+            total_cropped_images[i] = self.image_config.get_test_split_img(f, i, cropped_images, test_img_width, test_img_height, False, origin_files_index_size_path_test)
 
         dirs_list = [self.test_config.cropped_images + '/' + dir_ for dir_ in os.listdir(self.test_config.cropped_images)]
 

@@ -112,7 +112,7 @@ class SplitImage:
         #return rolling_frame_num
 
 
-    def get_test_split_img(self, file, idx, savedir, cropped_w, cropped_h, origin_files_index_size_path={}):
+    def get_test_split_img(self, file, idx, savedir, cropped_w, cropped_h, is_ir, origin_files_index_size_path={}):
 
         w, h = (cropped_w, cropped_h)
         rolling_frame_num = 0
@@ -123,7 +123,15 @@ class SplitImage:
             os.makedirs(savedir + r'/' + name)
             savedir = savedir + r'/' + name
 
-        img = Image.fromarray(np.array(Image.open(file)).astype("uint16"))
+        if is_ir:
+            ii = cv2.imread(file)
+            gray_image = cv2.cvtColor(ii, cv2.COLOR_BGR2GRAY)
+            img = Image.fromarray(np.array(gray_image).astype("uint16"))
+        else:
+            img = Image.fromarray(np.array(Image.open(file)).astype("uint16"))
+
+        #img = Image.fromarray(np.array(Image.open(file)).astype("uint16"))
+
         width, height = img.size
         frame_num = 0
         for col_i in range(0, width, w):
