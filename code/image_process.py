@@ -189,6 +189,8 @@ class SplitImage:
         img = img.astype('float32')
         # Normalize data
         img = img / 56535
+        #cv2.imwrite(r"C:\Users\user\Documents\ML\im_test\im1.png", img[0, :, :, 0])
+        #cv2.imwrite(r"C:\Users\user\Documents\ML\im_test\im1_ir.png", img[0, :, :, 1])
         return img
 
     def image_to_array_test(self, cropped_images, ir_images, cropped_image_offsets, vars ):

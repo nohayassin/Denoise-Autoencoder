@@ -48,7 +48,7 @@ class NetworkTesting:
 
             cropped_image_offsets = []
             ir_cropped_images_file = self.test_config.ir_cropped_images + r'/' + 'left-' + str(directory.split('-')[-1])
-            test_img_width, test_img_height, channels = self.test_config.get_image_to_array_test_input()
+            #test_img_width, test_img_height, channels = self.test_config.get_image_to_array_test_input()
             samples = self.image_config.image_to_array_test(directory, ir_cropped_images_file, cropped_image_offsets,
                                                             self.test_config.get_image_to_array_test_input())
             rolling_frame_num, width, height, origin_file_name = self.test_config.origin_files_index_size_path_test[i]

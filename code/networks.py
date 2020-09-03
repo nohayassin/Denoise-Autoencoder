@@ -13,7 +13,7 @@ class Network:
         if self.train_config.MODEL == self.train_config.BASIC:
             return Basic(self.train_config)
         if self.train_config.MODEL == self.train_config.UNET:
-            return Unet(pretrained_weights=None, input_size=(self.train_config.img_width, self.train_config.img_height, self.train_config.channels))
+            return Unet(self.train_config.channels, input_size=(self.train_config.img_width, self.train_config.img_height, self.train_config.channels), pretrained_weights=None)
         if self.train_config.MODEL == self.train_config.CCGAN:
             return CCGAN()
         if self.train_config.MODEL == self.train_config.CONV:

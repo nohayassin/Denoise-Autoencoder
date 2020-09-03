@@ -64,7 +64,7 @@ class NetworkTraining:
             if self.train_config.OUTPUT_EQUALS_INPUT:
                 pure_input_train = noisy_input_train
 
-            model.train(compiled_model, noisy_input_train, pure_input_train)
+            model.train(compiled_model, noisy_input_train, pure_input_train,self.train_config.models_path)
 
             # save the model
             compiled_model.save(save_model_name) # check if using same name is ok

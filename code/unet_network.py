@@ -5,12 +5,12 @@ from keras.callbacks import ModelCheckpoint, LearningRateScheduler
 from keras import backend as keras
 
 #Unet
-unet_steps_per_epoch = 300
-unet_epochs = 50 #100
+unet_steps_per_epoch = 700
+unet_epochs = 5
 
 class Unet:
 
-    def __init__(self,pretrained_weights=None, input_size=(256, 256, 1), channels=1):
+    def __init__(self,channels, input_size, pretrained_weights=None):
         self.pretrained_weights = pretrained_weights
         self.input_size = input_size
         self.channels = channels
@@ -73,8 +73,8 @@ class Unet:
 
         return model
 
-    def train(self, model, noisy_input_train, pure_input_train):
-        model_checkpoint = ModelCheckpoint('unet_membrane.hdf5', monitor='loss', verbose=1, save_best_only=True)
+    def train(self, model, noisy_input_train, pure_input_train, path=r"C:\Users\user\Documents\ML\models"):
+        model_checkpoint = ModelCheckpoint(path +r"\unet_membrane.hdf5", monitor='loss', verbose=1, save_best_only=True)
         # model.fit(noisy_input_train, pure_input_train, steps_per_epoch=unet_steps_per_epoch, epochs=unet_epochs, callbacks=[model_checkpoint])
         model.fit(noisy_input_train, pure_input_train, steps_per_epoch=unet_steps_per_epoch, epochs=unet_epochs,
                   callbacks=[model_checkpoint])
