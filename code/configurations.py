@@ -26,6 +26,7 @@ class NetworkConfig:
         self.OUTPUT_EQUALS_INPUT = 0 and self.TRAIN_DATA
         self.REMOVE_IR = 0 and self.TRAIN_DATA  # not relevant for now
         self.IMAGE_EXTENSION = '.png'  # '.tif'#
+        self.CONVERT_RAW_TO_PNG = 1
 
         # other configuration
         self.channels = 2
@@ -39,8 +40,8 @@ class TrainConfig(NetworkConfig):
         self.origin_files_index_size_path_noisy = {}
         self.origin_files_index_size_path_ir = {}
 
-        self.load_model_name = self.models_path + r"\DEPTH_20200831-082249.model_new_new"
-        self.LOAD_TRAINED_MODEL = 0 and self.TRAIN_DATA
+        self.load_model_name = self.models_path + r"\DEPTH_20200903-132536.model"
+        self.LOAD_TRAINED_MODEL = 1 and self.TRAIN_DATA
 
         self.imgdir_pure = self.images_path + r"\train\pure"
         self.imgdir_noisy = self.images_path + r"\train\noisy"
@@ -79,7 +80,7 @@ class TestConfig(NetworkConfig):
         self.origin_files_index_size_path_test = {}
         self.test_img_width, self.test_img_height = 480, 480
 
-        self.test_model_name = r"C:\Users\user\Documents\ML\models\DEPTH_20200831-082249.model_new_new"
+        self.test_model_name = r"C:\Users\user\Documents\ML\models\DEPTH_20200903-132536.model"
 
         self.imgdir = self.images_path + r"\tests\depth"
         self.realDataDir = self.images_path + r"\real_scenes_png"
@@ -90,8 +91,9 @@ class TestConfig(NetworkConfig):
         self.denoised_dir = self.images_path + r"\denoised"
         self.normalized_dir = self.images_path + r"\normalized"
 
-        self.pngdir = self.images_path + r"\real_scenes_raw"
-        self.pngoutdir = self.images_path + r"\real_scenes_png"
+        self.pngdir = self.images_path + r"\real_data"
+        self.noisy_pngoutdir = self.images_path + r"\tests\depth"
+        self.ir_pngoutdir = self.images_path + r"\tests\ir"
 
     def get_test_data_inputs(self, image_set="test"):
         if image_set == "ir":
