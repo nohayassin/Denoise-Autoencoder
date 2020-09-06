@@ -28,7 +28,8 @@ def autoencoder(network_type, train, test, statistics):
         image_processing.get_split_img(train_config.get_train_data_inputs("pure"), False)
         image_processing.get_split_img(train_config.get_train_data_inputs("noisy"), False)
 
-
+    if network_config.CONVERT_RAW_TO_PNG:
+        image_processing.raw_to_png(848, 480)
     if network_config.TRAIN_DATA:
         network_train.train()
 
@@ -44,7 +45,7 @@ if __name__ == '__main__':
     UNET = 1
     CCGAN = 2
 
-    train = 1
+    train = 0
     test = 0
     statistics = 0
 
