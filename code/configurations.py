@@ -24,7 +24,7 @@ class NetworkConfig:
         self.MASK_PURE_DATA = 0 and self.TRAIN_DATA
         self.REMOVE_BACKGROUND = 0 and self.MASK_PURE_DATA
         self.NORMALIZE = 0 and self.MASK_PURE_DATA
-        self.CROP_DATA = (0 or self.MASK_PURE_DATA) and self.TRAIN_DATA
+        self.CROP_DATA = (1 or self.MASK_PURE_DATA) and self.TRAIN_DATA
         self.TEST_REAL_DATA = 0 and self.TEST_DATA
 
         self.OUTPUT_EQUALS_INPUT = 0 and self.TRAIN_DATA
@@ -51,7 +51,7 @@ class TrainConfig(NetworkConfig):
         self.origin_files_index_size_path_ir = {}
 
         self.load_model_name = self.models_path + r"\DEPTH_20200903-132536.model"
-        self.LOAD_TRAINED_MODEL = 1 and self.TRAIN_DATA
+        self.LOAD_TRAINED_MODEL = 0 and self.TRAIN_DATA
 
         self.imgdir_pure = self.images_path + r"\train\pure"
         self.imgdir_noisy = self.images_path + r"\train\noisy"
