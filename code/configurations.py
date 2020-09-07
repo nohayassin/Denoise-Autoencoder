@@ -26,7 +26,7 @@ class NetworkConfig:
         self.OUTPUT_EQUALS_INPUT = 0 and self.TRAIN_DATA
         self.REMOVE_IR = 0 and self.TRAIN_DATA  # not relevant for now
         self.IMAGE_EXTENSION = '.png'  # '.tif'#
-        self.CONVERT_RAW_TO_PNG = 1
+        self.CONVERT_RAW_TO_PNG = 0
 
         # other configuration
         self.channels = 2

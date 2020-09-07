@@ -30,33 +30,32 @@ class SplitImage:
         ir_count , noisy_count = 0, 0
         for f in filelist:
             outDir = self.test_config.noisy_pngoutdir
-            img = np.fromfile(f, dtype='int16', sep="")
-            name = "res-"
-            idx = noisy_count
+            img = np.fromfile(f, dtype='uint16', sep="")
+            name, idx = "res-", noisy_count
             if "Infrared" in f:
                 outDir = self.test_config.ir_pngoutdir
-                img = np.fromfile(f, dtype='int8', sep="")
-                name = "left-"
-                idx = ir_count
+                img = np.fromfile(f, dtype='uint8', sep="")
+                name, idx = "left-", ir_count
                 ir_count += 1
             else:
                 noisy_count += 1
-            #name = os.path.basename(f)
-            #name = os.path.splitext(name)[0]
             name = name + str(idx)
             outfile = outDir + '/' + name + self.test_config.IMAGE_EXTENSION
-            cv2.imwrite(r"C:\Users\user\Documents\ML\im1.png", img)
+            #cv2.imwrite(r"C:\Users\user\Documents\ML\im1.png", img)
             # Parse numbers as floats
 
-            img = img / max(abs(img))
-            if min(img) < 0:
-                img = img - min(img)
-                img = img / max(img)
-            img = img * 56535
+            #img = img / max(abs(img))
+            #if min(img) < 0:
+            #    img = img - min(img)
+            #    img = img / max(img)
+            #img = img * 56535
             # img = img.astype('float32')
             # Normalize data
             img = img.reshape([height, width])
-            img = img.astype('uint16')
+            if "Infrared" in f:
+                img = img.astype('uint8')
+            else:
+                img = img.astype('uint16')
             cv2.imwrite(outfile, img)
 
     def normalize_images(self,img_path, height = 720, width = 1280):

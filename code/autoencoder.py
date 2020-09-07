@@ -45,7 +45,7 @@ if __name__ == '__main__':
     UNET = 1
     CCGAN = 2
 
-    train = 0
+    train = 1
     test = 0
     statistics = 0
 
