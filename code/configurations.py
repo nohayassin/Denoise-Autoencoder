@@ -1,10 +1,14 @@
+import os
 
 class NetworkConfig:
     def __init__(self, train=0, test=0, statistics=0, network_type=0):
 
-        self.images_path = r"C:\Users\user\Documents\ML\images"
-        self.models_path = r"C:\Users\user\Documents\ML\models"
-        self.logs_path = r"C:\Users\user\Documents\ML\logs"
+        self.root = r"C:\work\ML_files"
+        self.images_path = self.root + r"\images"
+        self.models_path = self.root  + r"\models"
+        self.logs_path = self.root  + r"\logs"
+        self.paths = [self.images_path, self.models_path, self.logs_path]
+        self.create_folders()
 
         # models
         self.BASIC = 0
@@ -33,6 +37,12 @@ class NetworkConfig:
         self.img_width, self.img_height = 128, 128  # 64, 64 ##256, 256 #512, 512
         self.EROSION_ITERATIONS = 1
 
+    def create_folders(self):
+        for path in self.paths:
+            if not os.path.exists(path):
+                os.makedirs(path)
+
+
 class TrainConfig(NetworkConfig):
     def __init__(self, network_config):
         NetworkConfig.__init__(self, network_config.TRAIN_DATA, network_config.TEST_DATA, network_config.DIFF_DATA, network_config.MODEL)
@@ -54,6 +64,10 @@ class TrainConfig(NetworkConfig):
         self.cropped_train_images_pure = self.images_path + r".\cropped_images\pure"
         self.cropped_train_images_noisy = self.images_path + r"\cropped_images\noisy"
 
+        self.paths = [self.imgdir_pure, self.imgdir_noisy, self.imgdir_ir, self.savedir_pure, self.savedir_noisy, self.cropped_train_images_ir,
+                 self.masked_pure, self.masked_noisy, self.cropped_train_images_pure , self.cropped_train_images_noisy]
+
+        self.create_folders()
 
 
     def get_mask_pure_inputs(self):
@@ -94,6 +108,11 @@ class TestConfig(NetworkConfig):
         self.pngdir = self.images_path + r"\real_data"
         self.noisy_pngoutdir = self.images_path + r"\tests\depth"
         self.ir_pngoutdir = self.images_path + r"\tests\ir"
+
+        self.paths = [self.imgdir, self.realDataDir, self.ir_imgdir, self.denoised_dir, self.cropped_images, self.ir_cropped_images,
+                 self.denoised_dir, self.normalized_dir, self.pngdir, self.noisy_pngoutdir, self.ir_pngoutdir]
+        self.create_folders()
+
 
     def get_test_data_inputs(self, image_set="test"):
         if image_set == "ir":
