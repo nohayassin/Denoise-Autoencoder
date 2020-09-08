@@ -250,7 +250,7 @@ class SplitImage:
             cropped_image_offsets.append([0, self.test_config.test_img_width])
         else:
             for i in range(len(im_files)):
-                cropped_image_offsets.append([im_files[i].split('_')[4], im_files[i].split('_')[6]])
+                cropped_image_offsets.append([os.path.basename(im_files[i]).split('_')[3], os.path.basename(im_files[i]).split('_')[5]])
 
         images_plt = [cv2.imread(f, cv2.IMREAD_UNCHANGED) for f in im_files if f.endswith(self.network_config.IMAGE_EXTENSION)]
         ir_images_plt = [cv2.imread(f, cv2.IMREAD_UNCHANGED) for f in ir_im_files if f.endswith(self.network_config.IMAGE_EXTENSION)]

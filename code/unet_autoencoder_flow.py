@@ -237,11 +237,11 @@ for i in range(iterations):
 
     # Start training Unet network
     model_checkpoint = ModelCheckpoint(models_path + r"\unet_membrane.hdf5", monitor='loss', verbose=1, save_best_only=True)
-    #compiled_model.fit(noisy_input_train, pure_input_train, steps_per_epoch=unet_steps_per_epoch, epochs=unet_epochs, callbacks=[model_checkpoint])
+    compiled_model.fit(noisy_input_train, pure_input_train, steps_per_epoch=unet_steps_per_epoch, epochs=unet_epochs, callbacks=[model_checkpoint])
 
     # save the model
-    #compiled_model.save(save_model_name)
-    #compiled_model = keras.models.load_model(save_model_name)
+    compiled_model.save(save_model_name)
+    compiled_model = keras.models.load_model(save_model_name)
 
 sys.stdout = old_stdout
 log_file.close()
@@ -250,6 +250,7 @@ log_file.close()
 
 origin_files_index_size_path_test = {}
 test_img_width, test_img_height = 480, 480
+img_width, img_height = test_img_width, test_img_height
 #test_model_name = save_model_name
 test_model_name = r"C:\Users\user\Documents\ML\models\DEPTH_20200903-132536.model_new"
 
@@ -272,38 +273,6 @@ for path in paths:
         os.makedirs(path)
 
 #================================= S T A R T   T E S T I N G ==========================================
-def get_test_split_img(file, idx, savedir, cropped_w, cropped_h, is_ir, origin_files_index_size_path={}):
-    for config in config_list:
-        filelist, total_cropped_images, cropped_images, test_img_width, test_img_height, is_ir, origin_files_index_size_path = config
-        for idx, file in enumerate(filelist):
-            w, h = (cropped_w, cropped_h)
-            rolling_frame_num = 0
-            name = os.path.basename(file)
-            name = os.path.splitext(name)[0]
-
-            if not os.path.exists(savedir + r'/' + name):
-                os.makedirs(savedir + r'/' + name)
-                savedir = savedir + r'/' + name
-
-            if is_ir:
-                ii = cv2.imread(file)
-                gray_image = cv2.cvtColor(ii, cv2.COLOR_BGR2GRAY)
-                img = Image.fromarray(np.array(gray_image).astype("uint16"))
-            else:
-                img = Image.fromarray(np.array(Image.open(file)).astype("uint16"))
-
-            width, height = img.size
-            frame_num = 0
-            for col_i in range(0, width, w):
-                for row_i in range(0, height, h):
-                    crop = img.crop((col_i, row_i, col_i + w, row_i + h))
-                    save_to= os.path.join(savedir, name +'_{:03}' +'_row_' + str(row_i) +'_col_' + str(col_i) +'_width' + str(w) +'_height' + str(h) + IMAGE_EXTENSION)
-                    crop.save(save_to.format(frame_num))
-                    frame_num += 1
-                origin_files_index_size_path[idx] =  (rolling_frame_num, width, height, file)
-
-            total_cropped_images[idx] = frame_num
-
 old_stdout = sys.stdout
 try:
     model = keras.models.load_model(test_model_name)
@@ -330,17 +299,14 @@ for folder in folders:
         except Exception as e:
             print('Failed to delete %s. Reason: %s' % (file_path, e))
 
-
 filelist = [f for f in glob.glob(imgdir + "**/*" + IMAGE_EXTENSION, recursive=True)]
 ir_filelist = [f for f in glob.glob(ir_imgdir + "**/*" + IMAGE_EXTENSION, recursive=True)]
 total_cropped_images = [0]*len(filelist)
 ir_total_cropped_images = [0]*len(ir_filelist)
 
-
-
+########### SPLIT IMAGES ##################
 ir_config = (ir_filelist, ir_total_cropped_images, ir_cropped_images, test_img_width, test_img_height, True, {})
 noisy_config = (filelist, total_cropped_images, cropped_images, test_img_width, test_img_height, False, origin_files_index_size_path_test)
-
 config_list = [ir_config, noisy_config]
 
 for config in config_list:
@@ -356,21 +322,26 @@ for config in config_list:
             new_cropped_images_dir = cropped_images_dir + r'/' + name
 
         if is_ir:
+            # ir images has 3 similar channels, we need only 1 channel
             ii = cv2.imread(file)
             gray_image = cv2.cvtColor(ii, cv2.COLOR_BGR2GRAY)
             img = Image.fromarray(np.array(gray_image).astype("uint16"))
+            #img = np.array(gray_image).astype("uint16")
         else:
             img = Image.fromarray(np.array(Image.open(file)).astype("uint16"))
+            #img = np.array(Image.open(file)).astype("uint16")
+            #cv2.imwrite(r"C:\Users\user\Documents\test_unet_flow\images\im"+str(idx)+".png", img)
 
-        width, height = img.size
+        width, height = 848, 480 #img.size
         frame_num = 0
         for col_i in range(0, width, w):
             for row_i in range(0, height, h):
                 crop = img.crop((col_i, row_i, col_i + w, row_i + h))
-                save_to = os.path.join(new_cropped_images_dir,
-                                       name + '_{:03}' + '_row_' + str(row_i) + '_col_' + str(col_i) + '_width' + str(
-                                           w) + '_height' + str(h) + IMAGE_EXTENSION)
+                #crop = img[row_i:row_i+h, col_i:col_i+w]
+                #crop[0][0] = 255
+                save_to = os.path.join(new_cropped_images_dir, name + '_{:03}' + '_row_' + str(row_i) + '_col_' + str(col_i) + '_width' + str(w) + '_height' + str(h) + IMAGE_EXTENSION)
                 crop.save(save_to.format(frame_num))
+                #cv2.imwrite(save_to.format(frame_num), crop)
                 frame_num += 1
             origin_files_index_size_path[idx] = (rolling_frame_num, width, height, file)
 
@@ -378,13 +349,61 @@ for config in config_list:
 
 dirs_list = [cropped_images + '/' + dir_ for dir_ in os.listdir(cropped_images)]
 
+########### IMAGE TO ARRAY  ##################
 for i,directory in enumerate(dirs_list):
 
     cropped_image_offsets = []
     ir_cropped_images_file = ir_cropped_images + r'/' + 'left-' + str(directory.split('-')[-1])
-    #test_img_width, test_img_height, channels = self.test_config.get_image_to_array_test_input()
-    samples = image_to_array_test(directory, ir_cropped_images_file, cropped_image_offsets,
-                                                    get_image_to_array_test_input())
+
+    cropped_w, cropped_h = test_img_width, test_img_height
+    im_files = []
+    ir_im_files = []
+    for fname in os.listdir(directory):
+        path = os.path.join(directory, fname)
+        if os.path.isdir(path):
+            # skip directories
+            continue
+        im_files.append(path)
+    im_files.sort()
+
+    for fname in os.listdir(ir_cropped_images_file):
+        path = os.path.join(ir_cropped_images_file, fname)
+        if os.path.isdir(path):
+            # skip directories
+            continue
+        ir_im_files.append(path)
+    ir_im_files.sort()
+
+    for i in range(len(im_files)):
+        cropped_image_offsets.append([os.path.basename(im_files[i]).split('_')[3], os.path.basename(im_files[i]).split('_')[5]])
+
+    images_plt = [cv2.imread(f, cv2.IMREAD_UNCHANGED) for f in im_files if
+                  f.endswith(IMAGE_EXTENSION)]
+    ir_images_plt = [cv2.imread(f, cv2.IMREAD_UNCHANGED) for f in ir_im_files if
+                     f.endswith(IMAGE_EXTENSION)]
+
+    images_plt = np.array(images_plt)
+    ir_images_plt = np.array(ir_images_plt)
+    images_plt = images_plt.reshape(images_plt.shape[0], cropped_w, cropped_h, 1)
+    ir_images_plt = ir_images_plt.reshape(ir_images_plt.shape[0], cropped_w, cropped_h, 1)
+
+    im_and_ir = images_plt
+    if channels > 1:
+        im_and_ir = np.stack((images_plt, ir_images_plt), axis=3)
+        im_and_ir = im_and_ir.reshape(im_and_ir.shape[0], cropped_w, cropped_h, channels)
+
+    img = np.array(im_and_ir)
+    # Parse numbers as floats
+    img = img.astype('float32')
+
+    # Normalize data : remove average then devide by standard deviation
+    #img = (img - np.average(img)) / np.var(img)
+    #img = img / 65535
+    img = img / 56535
+    samples = img
+
+    ###################################
+
     rolling_frame_num, width, height, origin_file_name = origin_files_index_size_path_test[i]
     cropped_w, cropped_h = test_img_width, test_img_height
     whole_image = np.zeros((height, width, channels), dtype="float32")
@@ -411,7 +430,7 @@ for i,directory in enumerate(dirs_list):
     t2 = time.perf_counter()
     print('test: ', directory.split('/')[-1], ': ', t2 - t1, 'seconds')
     denoised_name = directory.split('/')[-1]
-    outfile = denoised_dir + '/' + denoised_name.split('-')[0] + '' + '_denoised' + IMAGE_EXTENSION
+    outfile = denoised_dir + '/' + denoised_name.split('-')[0] + '' + '_denoised-' + denoised_name.split('-')[1] + IMAGE_EXTENSION
     whole_image = img_as_uint(whole_image)
     cv2.imwrite(outfile, whole_image[:,:,0])
 sys.stdout = old_stdout

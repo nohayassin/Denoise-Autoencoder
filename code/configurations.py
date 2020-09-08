@@ -91,7 +91,6 @@ class TestConfig(NetworkConfig):
         self.denoised_dir = self.images_path + r"\denoised"
         self.cropped_images = self.images_path + r"\cropped_tests\depth"
         self.ir_cropped_images = self.images_path + r"\cropped_tests\ir"
-        self.denoised_dir = self.images_path + r"\denoised"
         self.normalized_dir = self.images_path + r"\normalized"
 
         self.pngdir = self.images_path + r"\real_data"
