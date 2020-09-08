@@ -24,7 +24,7 @@ class NetworkConfig:
         self.MASK_PURE_DATA = 0 and self.TRAIN_DATA
         self.REMOVE_BACKGROUND = 0 and self.MASK_PURE_DATA
         self.NORMALIZE = 0 and self.MASK_PURE_DATA
-        self.CROP_DATA = (0 or self.MASK_PURE_DATA) and self.TRAIN_DATA
+        self.CROP_DATA = (1 or self.MASK_PURE_DATA) and self.TRAIN_DATA
         self.TEST_REAL_DATA = 0 and self.TEST_DATA
 
         self.OUTPUT_EQUALS_INPUT = 0 and self.TRAIN_DATA
