@@ -147,7 +147,7 @@ class SplitImage:
 
                 if not os.path.exists(cropped_images_dir + r'/' + name):
                     os.makedirs(cropped_images_dir + r'/' + name)
-                    cropped_images_dir = cropped_images_dir + r'/' + name
+                    new_cropped_images_dir = cropped_images_dir + r'/' + name
 
                 if is_ir:
                     ii = cv2.imread(file)
@@ -161,7 +161,7 @@ class SplitImage:
                 for col_i in range(0, width, w):
                     for row_i in range(0, height, h):
                         crop = img.crop((col_i, row_i, col_i + w, row_i + h))
-                        save_to= os.path.join(cropped_images_dir, name +'_{:03}' +'_row_' + str(row_i) +'_col_' + str(col_i) +'_width' + str(w) +'_height' + str(h) + self.network_config.IMAGE_EXTENSION)
+                        save_to= os.path.join(new_cropped_images_dir, name +'_{:03}' +'_row_' + str(row_i) +'_col_' + str(col_i) +'_width' + str(w) +'_height' + str(h) + self.network_config.IMAGE_EXTENSION)
                         crop.save(save_to.format(frame_num))
                         frame_num += 1
                     origin_files_index_size_path[idx] =  (rolling_frame_num, width, height, file)

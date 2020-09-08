@@ -259,7 +259,6 @@ ir_imgdir = images_path + r"\tests\ir"
 denoised_dir = images_path + r"\denoised"
 cropped_images = images_path + r"\cropped_tests\depth"
 ir_cropped_images = images_path + r"\cropped_tests\ir"
-denoised_dir = images_path + r"\denoised"
 normalized_dir = images_path + r"\normalized"
 
 pngdir = images_path + r"\real_data"
@@ -345,16 +344,16 @@ noisy_config = (filelist, total_cropped_images, cropped_images, test_img_width, 
 config_list = [ir_config, noisy_config]
 
 for config in config_list:
-    filelist, total_cropped_images, cropped_images, test_img_width, test_img_height, is_ir, origin_files_index_size_path = config
+    filelist, total_cropped_images, cropped_images_dir, cropped_w, cropped_h, is_ir, origin_files_index_size_path = list(config)
     for idx, file in enumerate(filelist):
         w, h = (cropped_w, cropped_h)
         rolling_frame_num = 0
         name = os.path.basename(file)
         name = os.path.splitext(name)[0]
 
-        if not os.path.exists(savedir + r'/' + name):
-            os.makedirs(savedir + r'/' + name)
-            savedir = savedir + r'/' + name
+        if not os.path.exists(cropped_images_dir + r'/' + name):
+            os.makedirs(cropped_images_dir + r'/' + name)
+            new_cropped_images_dir = cropped_images_dir + r'/' + name
 
         if is_ir:
             ii = cv2.imread(file)
@@ -368,7 +367,7 @@ for config in config_list:
         for col_i in range(0, width, w):
             for row_i in range(0, height, h):
                 crop = img.crop((col_i, row_i, col_i + w, row_i + h))
-                save_to = os.path.join(savedir,
+                save_to = os.path.join(new_cropped_images_dir,
                                        name + '_{:03}' + '_row_' + str(row_i) + '_col_' + str(col_i) + '_width' + str(
                                            w) + '_height' + str(h) + IMAGE_EXTENSION)
                 crop.save(save_to.format(frame_num))
