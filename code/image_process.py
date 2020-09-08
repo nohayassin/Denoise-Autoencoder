@@ -105,67 +105,68 @@ class SplitImage:
                 #cv2.imshow('PURE MASKED', pure_img)
                 io2.imsave(path, pure_img)
 
-    def get_split_img(self, vars, is_ir):
-        #imgdir, savedir, cropped_w = 28, cropped_h = 28, origin_files_index_size_path = {} = vars
-        imgdir, savedir, cropped_w, cropped_h, origin_files_index_size_path = vars
+    def get_split_img(self, config_list, cropped_w, cropped_h):
 
-        self.clean_directory(savedir)
-        filelist = [f for f in glob.glob(imgdir + "**/*" + self.network_config.IMAGE_EXTENSION, recursive=True)]
-        w, h = (cropped_w, cropped_h)
-        rolling_frame_num = 0
-        for i, file in enumerate(filelist):
-            name = os.path.basename(file)
-            name = os.path.splitext(name)[0]
+        for config in config_list:
+            imgdir, savedir, is_ir = config
 
-            if is_ir:
-                ii = cv2.imread(file)
-                gray_image = cv2.cvtColor(ii, cv2.COLOR_BGR2GRAY)
-                img = Image.fromarray(np.array(gray_image).astype("uint16"))
-            else:
-                img = Image.fromarray(np.array(Image.open(file)).astype("uint16"))
+            self.clean_directory(savedir)
+            filelist = [f for f in glob.glob(imgdir + "**/*" + self.network_config.IMAGE_EXTENSION, recursive=True)]
+            w, h = (cropped_w, cropped_h)
+            rolling_frame_num = 0
+            for i, file in enumerate(filelist):
+                name = os.path.basename(file)
+                name = os.path.splitext(name)[0]
 
-            width, height = img.size
-            frame_num = 0
-            for col_i in range(0, width, w):
-                for row_i in range(0, height, h):
-                    crop = img.crop((col_i, row_i, col_i + w, row_i + h))
-                    save_to= os.path.join(savedir, name +'_{:03}' +'_row_' + str(row_i) +'_col_' + str(col_i) +'_width' + str(w) +'_height' + str(h) + self.network_config.IMAGE_EXTENSION)
-                    crop.save(save_to.format(frame_num))
-                    frame_num += 1
-            rolling_frame_num += frame_num
-            origin_files_index_size_path[i] =  (rolling_frame_num, width, height, file)
-        #return rolling_frame_num
+                if is_ir:
+                    ii = cv2.imread(file)
+                    gray_image = cv2.cvtColor(ii, cv2.COLOR_BGR2GRAY)
+                    img = Image.fromarray(np.array(gray_image).astype("uint16"))
+                else:
+                    img = Image.fromarray(np.array(Image.open(file)).astype("uint16"))
+
+                width, height = img.size
+                frame_num = 0
+                for col_i in range(0, width, w):
+                    for row_i in range(0, height, h):
+                        crop = img.crop((col_i, row_i, col_i + w, row_i + h))
+                        save_to= os.path.join(savedir, name +'_{:03}' +'_row_' + str(row_i) +'_col_' + str(col_i) +'_width' + str(w) +'_height' + str(h) + self.network_config.IMAGE_EXTENSION)
+                        crop.save(save_to.format(frame_num))
+                        frame_num += 1
+                rolling_frame_num += frame_num
 
 
-    def get_test_split_img(self, file, idx, savedir, cropped_w, cropped_h, is_ir, origin_files_index_size_path={}):
+    def get_test_split_img(self, config_list):
+        for config in config_list:
+            filelist, total_cropped_images, cropped_images_dir, cropped_w, cropped_h, is_ir, origin_files_index_size_path = config
+            for idx, file in enumerate(filelist):
+                w, h = (cropped_w, cropped_h)
+                rolling_frame_num = 0
+                name = os.path.basename(file)
+                name = os.path.splitext(name)[0]
 
-        w, h = (cropped_w, cropped_h)
-        rolling_frame_num = 0
-        name = os.path.basename(file)
-        name = os.path.splitext(name)[0]
+                if not os.path.exists(cropped_images_dir + r'/' + name):
+                    os.makedirs(cropped_images_dir + r'/' + name)
+                    new_cropped_images_dir = cropped_images_dir + r'/' + name
 
-        if not os.path.exists(savedir + r'/' + name):
-            os.makedirs(savedir + r'/' + name)
-            savedir = savedir + r'/' + name
+                if is_ir:
+                    ii = cv2.imread(file)
+                    gray_image = cv2.cvtColor(ii, cv2.COLOR_BGR2GRAY)
+                    img = Image.fromarray(np.array(gray_image).astype("uint16"))
+                else:
+                    img = Image.fromarray(np.array(Image.open(file)).astype("uint16"))
 
-        if is_ir:
-            ii = cv2.imread(file)
-            gray_image = cv2.cvtColor(ii, cv2.COLOR_BGR2GRAY)
-            img = Image.fromarray(np.array(gray_image).astype("uint16"))
-        else:
-            img = Image.fromarray(np.array(Image.open(file)).astype("uint16"))
+                width, height = img.size
+                frame_num = 0
+                for col_i in range(0, width, w):
+                    for row_i in range(0, height, h):
+                        crop = img.crop((col_i, row_i, col_i + w, row_i + h))
+                        save_to= os.path.join(new_cropped_images_dir, name +'_{:03}' +'_row_' + str(row_i) +'_col_' + str(col_i) +'_width' + str(w) +'_height' + str(h) + self.network_config.IMAGE_EXTENSION)
+                        crop.save(save_to.format(frame_num))
+                        frame_num += 1
+                    origin_files_index_size_path[idx] =  (rolling_frame_num, width, height, file)
 
-        width, height = img.size
-        frame_num = 0
-        for col_i in range(0, width, w):
-            for row_i in range(0, height, h):
-                crop = img.crop((col_i, row_i, col_i + w, row_i + h))
-                save_to= os.path.join(savedir, name +'_{:03}' +'_row_' + str(row_i) +'_col_' + str(col_i) +'_width' + str(w) +'_height' + str(h) + self.network_config.IMAGE_EXTENSION)
-                crop.save(save_to.format(frame_num))
-                frame_num += 1
-            origin_files_index_size_path[idx] =  (rolling_frame_num, width, height, file)
-
-        return frame_num
+                total_cropped_images[idx] = frame_num
 
     def convert_16bit_to_8bit(file):
         image = cv2.imread(file, cv2.IMREAD_UNCHANGED)
@@ -249,7 +250,7 @@ class SplitImage:
             cropped_image_offsets.append([0, self.test_config.test_img_width])
         else:
             for i in range(len(im_files)):
-                cropped_image_offsets.append([im_files[i].split('_')[4], im_files[i].split('_')[6]])
+                cropped_image_offsets.append([os.path.basename(im_files[i]).split('_')[3], os.path.basename(im_files[i]).split('_')[5]])
 
         images_plt = [cv2.imread(f, cv2.IMREAD_UNCHANGED) for f in im_files if f.endswith(self.network_config.IMAGE_EXTENSION)]
         ir_images_plt = [cv2.imread(f, cv2.IMREAD_UNCHANGED) for f in ir_im_files if f.endswith(self.network_config.IMAGE_EXTENSION)]

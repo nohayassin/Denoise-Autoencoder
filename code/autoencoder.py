@@ -3,7 +3,6 @@ from image_statistics import *
 from network_testing import *
 from network_training import NetworkTraining
 from configurations import *
-import convert_to_png
 
 def autoencoder(network_type, train, test, statistics):
     # convert_to_png.raw_to_png(paths.pngDir, paths.pngOutDir, 1280, 720)
@@ -24,12 +23,14 @@ def autoencoder(network_type, train, test, statistics):
     if network_config.CROP_DATA:
         print('Cropping training data ..')
         #train_config.imgdir_pure = train_config.masked_pure
-        image_processing.get_split_img(train_config.get_train_data_inputs("ir"), True)
-        image_processing.get_split_img(train_config.get_train_data_inputs("pure"), False)
-        image_processing.get_split_img(train_config.get_train_data_inputs("noisy"), False)
+        config_list = [(train_config.imgdir_ir, train_config.cropped_train_images_ir, True),
+                       (train_config.imgdir_pure, train_config.savedir_pure, False),
+                       (train_config.imgdir_noisy, train_config.savedir_noisy, False)]
+        image_processing.get_split_img(config_list, train_config.img_width, train_config.img_height)
 
     if network_config.CONVERT_RAW_TO_PNG:
         image_processing.raw_to_png(848, 480)
+
     if network_config.TRAIN_DATA:
         network_train.train()
 
