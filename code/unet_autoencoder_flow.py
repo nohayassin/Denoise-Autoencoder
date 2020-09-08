@@ -181,10 +181,10 @@ compiled_model = model
 
 print('Cropping training data ..')
 cropped_w, cropped_h = img_width, img_height
-config_list = [[imgdir_ir, cropped_train_images_ir, True], [imgdir_pure, savedir_pure, False],
-               [imgdir_noisy, savedir_noisy, False]]
+config_list = [(imgdir_ir, cropped_train_images_ir, True), (imgdir_pure, savedir_pure, False),
+               (imgdir_noisy, savedir_noisy, False)]
 for config in config_list:
-    [imgdir, savedir, is_ir] = config_list
+    imgdir, savedir, is_ir = config
     for filename in os.listdir(savedir):
         file_path = os.path.join(savedir, filename)
         try:
