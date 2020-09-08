@@ -3,7 +3,7 @@ import os
 class NetworkConfig:
     def __init__(self, train=0, test=0, statistics=0, network_type=0):
 
-        self.root = r"C:\work\ML_files"
+        self.root = r"C:\Users\user\Documents\ML"
         self.images_path = self.root + r"\images"
         self.models_path = self.root  + r"\models"
         self.logs_path = self.root  + r"\logs"
@@ -51,7 +51,7 @@ class TrainConfig(NetworkConfig):
         self.origin_files_index_size_path_ir = {}
 
         self.load_model_name = self.models_path + r"\DEPTH_20200903-132536.model"
-        self.LOAD_TRAINED_MODEL = 1 and self.TRAIN_DATA
+        self.LOAD_TRAINED_MODEL = 0 and self.TRAIN_DATA
 
         self.imgdir_pure = self.images_path + r"\train\pure"
         self.imgdir_noisy = self.images_path + r"\train\noisy"
@@ -94,7 +94,7 @@ class TestConfig(NetworkConfig):
         self.origin_files_index_size_path_test = {}
         self.test_img_width, self.test_img_height = 480, 480
 
-        self.test_model_name = r"C:\Users\user\Documents\ML\models\DEPTH_20200903-132536.model"
+        self.test_model_name = r"C:\Users\user\Documents\ML\models\DEPTH_20200903-132536.model_new"
 
         self.imgdir = self.images_path + r"\tests\depth"
         self.realDataDir = self.images_path + r"\real_scenes_png"
