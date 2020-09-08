@@ -102,13 +102,6 @@ class TestConfig(NetworkConfig):
                  self.denoised_dir, self.normalized_dir, self.pngdir, self.noisy_pngoutdir, self.ir_pngoutdir]
         self.create_folders()
 
-
-    def get_test_data_inputs(self, image_set="test"):
-        if image_set == "ir":
-            return self.ir_cropped_images, self.test_img_width, self.test_img_height, self.origin_files_index_size_path_test
-        if image_set == "test":
-            return self.cropped_images, self.test_img_width, self.test_img_height, self.origin_files_index_size_path_test
-
     def get_image_to_array_test_input(self):
         return self.test_img_width, self.test_img_height, self.channels
 

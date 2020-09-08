@@ -237,11 +237,11 @@ for i in range(iterations):
 
     # Start training Unet network
     model_checkpoint = ModelCheckpoint(models_path + r"\unet_membrane.hdf5", monitor='loss', verbose=1, save_best_only=True)
-    compiled_model.fit(noisy_input_train, pure_input_train, steps_per_epoch=unet_steps_per_epoch, epochs=unet_epochs, callbacks=[model_checkpoint])
+    #compiled_model.fit(noisy_input_train, pure_input_train, steps_per_epoch=unet_steps_per_epoch, epochs=unet_epochs, callbacks=[model_checkpoint])
 
     # save the model
-    compiled_model.save(save_model_name)
-    compiled_model = keras.models.load_model(save_model_name)
+    #compiled_model.save(save_model_name)
+    #compiled_model = keras.models.load_model(save_model_name)
 
 sys.stdout = old_stdout
 log_file.close()
@@ -250,7 +250,7 @@ log_file.close()
 
 origin_files_index_size_path_test = {}
 test_img_width, test_img_height = 480, 480
-
+#test_model_name = save_model_name
 test_model_name = r"C:\Users\user\Documents\ML\models\DEPTH_20200903-132536.model_new"
 
 imgdir = images_path + r"\tests\depth"
@@ -273,6 +273,37 @@ for path in paths:
         os.makedirs(path)
 
 #================================= S T A R T   T E S T I N G ==========================================
+def get_test_split_img(file, idx, savedir, cropped_w, cropped_h, is_ir, origin_files_index_size_path={}):
+    for config in config_list:
+        filelist, total_cropped_images, cropped_images, test_img_width, test_img_height, is_ir, origin_files_index_size_path = config
+        for idx, file in enumerate(filelist):
+            w, h = (cropped_w, cropped_h)
+            rolling_frame_num = 0
+            name = os.path.basename(file)
+            name = os.path.splitext(name)[0]
+
+            if not os.path.exists(savedir + r'/' + name):
+                os.makedirs(savedir + r'/' + name)
+                savedir = savedir + r'/' + name
+
+            if is_ir:
+                ii = cv2.imread(file)
+                gray_image = cv2.cvtColor(ii, cv2.COLOR_BGR2GRAY)
+                img = Image.fromarray(np.array(gray_image).astype("uint16"))
+            else:
+                img = Image.fromarray(np.array(Image.open(file)).astype("uint16"))
+
+            width, height = img.size
+            frame_num = 0
+            for col_i in range(0, width, w):
+                for row_i in range(0, height, h):
+                    crop = img.crop((col_i, row_i, col_i + w, row_i + h))
+                    save_to= os.path.join(savedir, name +'_{:03}' +'_row_' + str(row_i) +'_col_' + str(col_i) +'_width' + str(w) +'_height' + str(h) + IMAGE_EXTENSION)
+                    crop.save(save_to.format(frame_num))
+                    frame_num += 1
+                origin_files_index_size_path[idx] =  (rolling_frame_num, width, height, file)
+
+            total_cropped_images[idx] = frame_num
 
 old_stdout = sys.stdout
 try:
@@ -305,13 +336,46 @@ filelist = [f for f in glob.glob(imgdir + "**/*" + IMAGE_EXTENSION, recursive=Tr
 ir_filelist = [f for f in glob.glob(ir_imgdir + "**/*" + IMAGE_EXTENSION, recursive=True)]
 total_cropped_images = [0]*len(filelist)
 ir_total_cropped_images = [0]*len(ir_filelist)
-for i,f in enumerate(ir_filelist) :
-    cropped_images, test_img_width, test_img_height, origin_files_index_size_path_test = get_test_data_inputs("ir")
-    ir_total_cropped_images[i] = get_test_split_img(f, i, cropped_images, test_img_width, test_img_height, True, origin_files_index_size_path_test)
 
-for i,f in enumerate(filelist) :
-    cropped_images, test_img_width, test_img_height, origin_files_index_size_path_test = get_test_data_inputs("test")
-    total_cropped_images[i] = get_test_split_img(f, i, cropped_images, test_img_width, test_img_height, False, origin_files_index_size_path_test)
+
+
+ir_config = (ir_filelist, ir_total_cropped_images, ir_cropped_images, test_img_width, test_img_height, True, {})
+noisy_config = (filelist, total_cropped_images, cropped_images, test_img_width, test_img_height, False, origin_files_index_size_path_test)
+
+config_list = [ir_config, noisy_config]
+
+for config in config_list:
+    filelist, total_cropped_images, cropped_images, test_img_width, test_img_height, is_ir, origin_files_index_size_path = config
+    for idx, file in enumerate(filelist):
+        w, h = (cropped_w, cropped_h)
+        rolling_frame_num = 0
+        name = os.path.basename(file)
+        name = os.path.splitext(name)[0]
+
+        if not os.path.exists(savedir + r'/' + name):
+            os.makedirs(savedir + r'/' + name)
+            savedir = savedir + r'/' + name
+
+        if is_ir:
+            ii = cv2.imread(file)
+            gray_image = cv2.cvtColor(ii, cv2.COLOR_BGR2GRAY)
+            img = Image.fromarray(np.array(gray_image).astype("uint16"))
+        else:
+            img = Image.fromarray(np.array(Image.open(file)).astype("uint16"))
+
+        width, height = img.size
+        frame_num = 0
+        for col_i in range(0, width, w):
+            for row_i in range(0, height, h):
+                crop = img.crop((col_i, row_i, col_i + w, row_i + h))
+                save_to = os.path.join(savedir,
+                                       name + '_{:03}' + '_row_' + str(row_i) + '_col_' + str(col_i) + '_width' + str(
+                                           w) + '_height' + str(h) + IMAGE_EXTENSION)
+                crop.save(save_to.format(frame_num))
+                frame_num += 1
+            origin_files_index_size_path[idx] = (rolling_frame_num, width, height, file)
+
+        total_cropped_images[idx] = frame_num
 
 dirs_list = [cropped_images + '/' + dir_ for dir_ in os.listdir(cropped_images)]
 
