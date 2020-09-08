@@ -14,92 +14,121 @@ import numpy as np
 import cv2
 from skimage import io as io2
 
-#Unet
-unet_steps_per_epoch = 1700
-unet_epochs = 100
 
 
 #============================================ M A I N =================================================
-root = r"C:\Users\user\Documents\ML"
+root = r"C:\Users\user\Documents\test_unet_flow"
 images_path = root + r"\images"
 models_path = root  + r"\models"
 logs_path = root  + r"\logs"
-
-
-
-
 imgdir_pure = images_path + r"\train\pure"
 imgdir_noisy = images_path + r"\train\noisy"
 imgdir_ir = images_path + r"\train\ir"
 savedir_pure = images_path + r"\cropped_images\pure"
 savedir_noisy = images_path + r"\cropped_images\noisy"
 cropped_train_images_ir = images_path + r"\cropped_images\ir"
-masked_pure = images_path + r"\train\masked_pure"
-masked_noisy = images_path + r"\train\masked_noisy"
 cropped_train_images_pure = images_path + r".\cropped_images\pure"
 cropped_train_images_noisy = images_path + r"\cropped_images\noisy"
 
 
-paths = [images_path, models_path, logs_path,
-              imgdir_pure, imgdir_noisy, imgdir_ir, savedir_pure, savedir_noisy,
-              cropped_train_images_ir,
-              masked_pure, masked_noisy, cropped_train_images_pure, cropped_train_images_noisy]
+paths = [images_path, models_path, logs_path, imgdir_pure, imgdir_noisy, imgdir_ir, savedir_pure, savedir_noisy,
+              cropped_train_images_ir, cropped_train_images_pure, cropped_train_images_noisy]
 
 for path in paths:
     if not os.path.exists(path):
         os.makedirs(path)
 
 #======================================================================================================
-    def image_to_array(self, iteration, images_num_to_process, cropped_w, cropped_h, cropped_images, ir_images, channels, cropped_image_offsets=[]):
-        im_files, ir_im_files  = [], []
-        ls = os.listdir(cropped_images)
-        ls.sort()
-        limit = iteration+images_num_to_process
-        if iteration+images_num_to_process > len(ls):
-            limit = len(ls)
+IMAGE_EXTENSION = '.png'
+def get_split_img(imgdir, savedir, cropped_w, cropped_h, origin_files_index_size_path, is_ir):
+    for filename in os.listdir(savedir):
+        file_path = os.path.join(savedir, filename)
+        try:
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+        except Exception as e:
+            print('Failed to delete %s. Reason: %s' % (file_path, e))
 
-        for i in range(iteration, limit):
-            path = os.path.join(cropped_images, ls[i])
-            if os.path.isdir(path):
-                # skip directories
-                continue
-            im_files.append(path)
-        ls = os.listdir(ir_images)
-        ls.sort()
-        for i in range(iteration, limit):
-            path = os.path.join(ir_images, ls[i])
-            if os.path.isdir(path):
-                # skip directories
-                continue
-            ir_im_files.append(path)
+    filelist = [f for f in glob.glob(imgdir + "**/*" + IMAGE_EXTENSION, recursive=True)]
+    w, h = (cropped_w, cropped_h)
+    rolling_frame_num = 0
+    for i, file in enumerate(filelist):
+        name = os.path.basename(file)
+        name = os.path.splitext(name)[0]
 
-        im_files.sort()
-        ir_im_files.sort()
-        for i in range(len(im_files)):
-            cropped_image_offsets.append([im_files[i].split('_')[4], im_files[i].split('_')[6]])
+        if is_ir:
+            ii = cv2.imread(file)
+            gray_image = cv2.cvtColor(ii, cv2.COLOR_BGR2GRAY)
+            img = Image.fromarray(np.array(gray_image).astype("uint16"))
+        else:
+            img = Image.fromarray(np.array(Image.open(file)).astype("uint16"))
 
-        images_plt = [cv2.imread(f, cv2.IMREAD_UNCHANGED) for f in im_files if f.endswith(self.network_config.IMAGE_EXTENSION)]
-        ir_images_plt = [cv2.imread(f, cv2.IMREAD_UNCHANGED) for f in ir_im_files if f.endswith(self.network_config.IMAGE_EXTENSION)]
+        width, height = img.size
+        frame_num = 0
+        for col_i in range(0, width, w):
+            for row_i in range(0, height, h):
+                crop = img.crop((col_i, row_i, col_i + w, row_i + h))
+                save_to = os.path.join(savedir,
+                                       name + '_{:03}' + '_row_' + str(row_i) + '_col_' + str(col_i) + '_width' + str(
+                                           w) + '_height' + str(h) + IMAGE_EXTENSION)
+                crop.save(save_to.format(frame_num))
+                frame_num += 1
+        rolling_frame_num += frame_num
+        origin_files_index_size_path[i] = (rolling_frame_num, width, height, file)
 
-        images_plt = np.array(images_plt)
-        ir_images_plt = np.array(ir_images_plt)
-        images_plt = images_plt.reshape(images_plt.shape[0], cropped_w, cropped_h, 1)
-        ir_images_plt = ir_images_plt.reshape(ir_images_plt.shape[0], cropped_w, cropped_h, 1)
+def image_to_array(iteration, images_num_to_process, cropped_w, cropped_h, cropped_images, ir_images, channels, cropped_image_offsets=[]):
+    im_files, ir_im_files  = [], []
+    ls = os.listdir(cropped_images)
+    ls.sort()
+    limit = iteration+images_num_to_process
+    if iteration+images_num_to_process > len(ls):
+        limit = len(ls)
 
-        im_and_ir = images_plt
-        if channels > 1:
-            im_and_ir = np.stack((images_plt,ir_images_plt), axis=3)
-            im_and_ir = im_and_ir.reshape(im_and_ir.shape[0], cropped_w, cropped_h, channels)
+    for i in range(iteration, limit):
+        path = os.path.join(cropped_images, ls[i])
+        if os.path.isdir(path):
+            # skip directories
+            continue
+        im_files.append(path)
+    ls = os.listdir(ir_images)
+    ls.sort()
+    for i in range(iteration, limit):
+        path = os.path.join(ir_images, ls[i])
+        if os.path.isdir(path):
+            # skip directories
+            continue
+        ir_im_files.append(path)
 
-        # convert your lists into a numpy array of size (N, H, W, C)
-        img = np.array(im_and_ir)
-        # Parse numbers as floats
-        img = img.astype('float32')
+    im_files.sort()
+    ir_im_files.sort()
+    for i in range(len(im_files)):
+        cropped_image_offsets.append([im_files[i].split('_')[4], im_files[i].split('_')[6]])
 
-        # Normalize data : remove average then devide by standard deviation
-        img = (img - np.average(img)) / np.var(img)
-        #img = img / 65535
-        return img
+    images_plt = [cv2.imread(f, cv2.IMREAD_UNCHANGED) for f in im_files if f.endswith(IMAGE_EXTENSION)]
+    ir_images_plt = [cv2.imread(f, cv2.IMREAD_UNCHANGED) for f in ir_im_files if f.endswith(IMAGE_EXTENSION)]
+
+    images_plt = np.array(images_plt)
+    ir_images_plt = np.array(ir_images_plt)
+    images_plt = images_plt.reshape(images_plt.shape[0], cropped_w, cropped_h, 1)
+    ir_images_plt = ir_images_plt.reshape(ir_images_plt.shape[0], cropped_w, cropped_h, 1)
+
+    im_and_ir = images_plt
+    if channels > 1:
+        im_and_ir = np.stack((images_plt,ir_images_plt), axis=3)
+        im_and_ir = im_and_ir.reshape(im_and_ir.shape[0], cropped_w, cropped_h, channels)
+
+    # convert your lists into a numpy array of size (N, H, W, C)
+    img = np.array(im_and_ir)
+    # Parse numbers as floats
+    img = img.astype('float32')
+
+    # Normalize data : remove average then devide by standard deviation
+    img = (img - np.average(img)) / np.var(img)
+    #img = img / 65535
+    return img
+
 #============================================ T R A I N ===============================================
 # other configuration
 channels = 2
@@ -109,6 +138,14 @@ origin_files_index_size_path_pure = {}
 origin_files_index_size_path_noisy = {}
 origin_files_index_size_path_ir = {}
 
+#Unet
+unet_steps_per_epoch = 1700
+unet_epochs = 1
+
+print('Cropping training data ..')
+get_split_img(imgdir_ir, cropped_train_images_ir, img_width, img_height, origin_files_index_size_path_ir, True)
+get_split_img(imgdir_pure, savedir_pure, img_width, img_height, origin_files_index_size_path_pure, False)
+get_split_img(imgdir_noisy, savedir_noisy, img_width, img_height, origin_files_index_size_path_noisy, False)
 
 # Get the file paths
 kb.clear_session()
@@ -157,14 +194,12 @@ conv5 = Conv2D(1024, 3, activation='relu', padding='same', kernel_initializer='h
 conv5 = Conv2D(1024, 3, activation='relu', padding='same', kernel_initializer='he_normal')(conv5)
 drop5 = Dropout(0.5)(conv5)
 
-up6 = Conv2D(512, 2, activation='relu', padding='same', kernel_initializer='he_normal')(
-    UpSampling2D(size=(2, 2))(drop5))
+up6 = Conv2D(512, 2, activation='relu', padding='same', kernel_initializer='he_normal')(UpSampling2D(size=(2, 2))(drop5))
 merge6 = concatenate([drop4, up6], axis=3)
 conv6 = Conv2D(512, 3, activation='relu', padding='same', kernel_initializer='he_normal')(merge6)
 conv6 = Conv2D(512, 3, activation='relu', padding='same', kernel_initializer='he_normal')(conv6)
 
-up7 = Conv2D(256, 2, activation='relu', padding='same', kernel_initializer='he_normal')(
-    UpSampling2D(size=(2, 2))(conv6))
+up7 = Conv2D(256, 2, activation='relu', padding='same', kernel_initializer='he_normal')(UpSampling2D(size=(2, 2))(conv6))
 merge7 = concatenate([conv3, up7], axis=3)
 conv7 = Conv2D(256, 3, activation='relu', padding='same', kernel_initializer='he_normal')(merge7)
 conv7 = Conv2D(256, 3, activation='relu', padding='same', kernel_initializer='he_normal')(conv7)
@@ -175,8 +210,7 @@ merge8 = concatenate([conv2, up8], axis=3)
 conv8 = Conv2D(128, 3, activation='relu', padding='same', kernel_initializer='he_normal')(merge8)
 conv8 = Conv2D(128, 3, activation='relu', padding='same', kernel_initializer='he_normal')(conv8)
 
-up9 = Conv2D(64, 2, activation='relu', padding='same', kernel_initializer='he_normal')(
-    UpSampling2D(size=(2, 2))(conv8))
+up9 = Conv2D(64, 2, activation='relu', padding='same', kernel_initializer='he_normal')(UpSampling2D(size=(2, 2))(conv8))
 merge9 = concatenate([conv1, up9], axis=3)
 conv9 = Conv2D(64, 3, activation='relu', padding='same', kernel_initializer='he_normal')(merge9)
 conv9 = Conv2D(64, 3, activation='relu', padding='same', kernel_initializer='he_normal')(conv9)
@@ -195,11 +229,15 @@ save_model_name = models_path +'/' + model_name
 images_num_to_process = 1000
 all_cropped_num = len(os.listdir(cropped_train_images_pure))
 iterations = all_cropped_num // images_num_to_process
+if all_cropped_num % images_num_to_process > 0 :
+    iterations += 1
 for i in range(iterations):
     print('*************** Iteration : ', i, '****************')
-
-    pure_input_train = image_to_array(i*images_num_to_process, images_num_to_process, img_width, img_height, cropped_train_images_pure, cropped_train_images_ir, channels)
-    noisy_input_train = image_to_array(i*images_num_to_process, images_num_to_process, img_width, img_height, cropped_train_images_noisy, cropped_train_images_ir, channels)
+    first_image = i*images_num_to_process
+    if i == iterations-1:
+        images_num_to_process = all_cropped_num - i*images_num_to_process
+    pure_input_train = image_to_array(first_image , images_num_to_process, img_width, img_height, cropped_train_images_pure, cropped_train_images_ir, channels)
+    noisy_input_train = image_to_array(first_image, images_num_to_process, img_width, img_height, cropped_train_images_noisy, cropped_train_images_ir, channels)
 
     # Start training Unet network
     model_checkpoint = ModelCheckpoint(models_path + r"\unet_membrane.hdf5", monitor='loss', verbose=1, save_best_only=True)
