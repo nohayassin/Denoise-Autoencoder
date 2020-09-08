@@ -40,43 +40,6 @@ for path in paths:
 
 #======================================================================================================
 IMAGE_EXTENSION = '.png'
-def get_split_img(imgdir, savedir, cropped_w, cropped_h, origin_files_index_size_path, is_ir):
-    for filename in os.listdir(savedir):
-        file_path = os.path.join(savedir, filename)
-        try:
-            if os.path.isfile(file_path) or os.path.islink(file_path):
-                os.unlink(file_path)
-            elif os.path.isdir(file_path):
-                shutil.rmtree(file_path)
-        except Exception as e:
-            print('Failed to delete %s. Reason: %s' % (file_path, e))
-
-    filelist = [f for f in glob.glob(imgdir + "**/*" + IMAGE_EXTENSION, recursive=True)]
-    w, h = (cropped_w, cropped_h)
-    rolling_frame_num = 0
-    for i, file in enumerate(filelist):
-        name = os.path.basename(file)
-        name = os.path.splitext(name)[0]
-
-        if is_ir:
-            ii = cv2.imread(file)
-            gray_image = cv2.cvtColor(ii, cv2.COLOR_BGR2GRAY)
-            img = Image.fromarray(np.array(gray_image).astype("uint16"))
-        else:
-            img = Image.fromarray(np.array(Image.open(file)).astype("uint16"))
-
-        width, height = img.size
-        frame_num = 0
-        for col_i in range(0, width, w):
-            for row_i in range(0, height, h):
-                crop = img.crop((col_i, row_i, col_i + w, row_i + h))
-                save_to = os.path.join(savedir,
-                                       name + '_{:03}' + '_row_' + str(row_i) + '_col_' + str(col_i) + '_width' + str(
-                                           w) + '_height' + str(h) + IMAGE_EXTENSION)
-                crop.save(save_to.format(frame_num))
-                frame_num += 1
-        rolling_frame_num += frame_num
-        origin_files_index_size_path[i] = (rolling_frame_num, width, height, file)
 
 def image_to_array(iteration, images_num_to_process, cropped_w, cropped_h, cropped_images, ir_images, channels, cropped_image_offsets=[]):
     im_files, ir_im_files  = [], []
@@ -134,18 +97,9 @@ def image_to_array(iteration, images_num_to_process, cropped_w, cropped_h, cropp
 channels = 2
 img_width, img_height = 128, 128
 
-origin_files_index_size_path_pure = {}
-origin_files_index_size_path_noisy = {}
-origin_files_index_size_path_ir = {}
-
 #Unet
 unet_steps_per_epoch = 1700
 unet_epochs = 1
-
-print('Cropping training data ..')
-get_split_img(imgdir_ir, cropped_train_images_ir, img_width, img_height, origin_files_index_size_path_ir, True)
-get_split_img(imgdir_pure, savedir_pure, img_width, img_height, origin_files_index_size_path_pure, False)
-get_split_img(imgdir_noisy, savedir_noisy, img_width, img_height, origin_files_index_size_path_noisy, False)
 
 # Get the file paths
 kb.clear_session()
@@ -224,6 +178,50 @@ model.compile(optimizer=Adam(lr=1e-4), loss='binary_crossentropy', metrics=['acc
 model.summary()
 compiled_model = model
 ######## Model is compiled
+
+print('Cropping training data ..')
+cropped_w, cropped_h = img_width, img_height
+config_list = [[imgdir_ir, cropped_train_images_ir, True], [imgdir_pure, savedir_pure, False],
+               [imgdir_noisy, savedir_noisy, False]]
+for config in config_list:
+    [imgdir, savedir, is_ir] = config_list
+    for filename in os.listdir(savedir):
+        file_path = os.path.join(savedir, filename)
+        try:
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+        except Exception as e:
+            print('Failed to delete %s. Reason: %s' % (file_path, e))
+
+    filelist = [f for f in glob.glob(imgdir + "**/*" + IMAGE_EXTENSION, recursive=True)]
+    w, h = (cropped_w, cropped_h)
+    rolling_frame_num = 0
+    for i, file in enumerate(filelist):
+        name = os.path.basename(file)
+        name = os.path.splitext(name)[0]
+
+        if is_ir:
+            ii = cv2.imread(file)
+            gray_image = cv2.cvtColor(ii, cv2.COLOR_BGR2GRAY)
+            img = Image.fromarray(np.array(gray_image).astype("uint16"))
+        else:
+            img = Image.fromarray(np.array(Image.open(file)).astype("uint16"))
+
+        width, height = img.size
+        frame_num = 0
+        for col_i in range(0, width, w):
+            for row_i in range(0, height, h):
+                crop = img.crop((col_i, row_i, col_i + w, row_i + h))
+                save_to = os.path.join(savedir,
+                                       name + '_{:03}' + '_row_' + str(row_i) + '_col_' + str(col_i) + '_width' + str(
+                                           w) + '_height' + str(h) + IMAGE_EXTENSION)
+                crop.save(save_to.format(frame_num))
+                frame_num += 1
+        rolling_frame_num += frame_num
+
+##### all data is cropped
 
 save_model_name = models_path +'/' + model_name
 images_num_to_process = 1000
