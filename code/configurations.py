@@ -24,7 +24,7 @@ class NetworkConfig:
         self.MASK_PURE_DATA = 0 and self.TRAIN_DATA
         self.REMOVE_BACKGROUND = 0 and self.MASK_PURE_DATA
         self.NORMALIZE = 0 and self.MASK_PURE_DATA
-        self.CROP_DATA = (1 or self.MASK_PURE_DATA) and self.TRAIN_DATA
+        self.CROP_DATA = (0 or self.MASK_PURE_DATA) and self.TRAIN_DATA
         self.TEST_REAL_DATA = 0 and self.TEST_DATA
 
         self.OUTPUT_EQUALS_INPUT = 0 and self.TRAIN_DATA
@@ -46,9 +46,6 @@ class NetworkConfig:
 class TrainConfig(NetworkConfig):
     def __init__(self, network_config):
         NetworkConfig.__init__(self, network_config.TRAIN_DATA, network_config.TEST_DATA, network_config.DIFF_DATA, network_config.MODEL)
-        self.origin_files_index_size_path_pure = {}
-        self.origin_files_index_size_path_noisy = {}
-        self.origin_files_index_size_path_ir = {}
 
         self.load_model_name = self.models_path + r"\DEPTH_20200903-132536.model"
         self.LOAD_TRAINED_MODEL = 0 and self.TRAIN_DATA
@@ -72,14 +69,6 @@ class TrainConfig(NetworkConfig):
 
     def get_mask_pure_inputs(self):
         return self.imgdir_pure, self.imgdir_noisy, self.masked_pure
-
-    def get_train_data_inputs(self, image_set="pure"):
-        if image_set == "ir":
-            return self.imgdir_ir, self.cropped_train_images_ir, self.img_width, self.img_height, self.origin_files_index_size_path_ir
-        if image_set == "noisy":
-            return self.imgdir_noisy, self.savedir_noisy, self.img_width, self.img_height, self.origin_files_index_size_path_noisy
-        if image_set == "pure":
-            return self.imgdir_pure, self.savedir_pure, self.img_width, self.img_height, self.origin_files_index_size_path_pure
 
     def get_image_to_array_train_input(self, type="pure"):
         if type == "pure":

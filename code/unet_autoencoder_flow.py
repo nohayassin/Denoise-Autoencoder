@@ -7,13 +7,12 @@ from keras.models import *
 from keras.layers import *
 from keras.optimizers import *
 from keras.callbacks import ModelCheckpoint
-import os, shutil
 import glob
 from PIL import Image
 import numpy as np
 import cv2
 from skimage import io as io2
-
+from skimage import img_as_uint
 
 
 #============================================ M A I N =================================================
@@ -29,7 +28,6 @@ savedir_noisy = images_path + r"\cropped_images\noisy"
 cropped_train_images_ir = images_path + r"\cropped_images\ir"
 cropped_train_images_pure = images_path + r".\cropped_images\pure"
 cropped_train_images_noisy = images_path + r"\cropped_images\noisy"
-
 
 paths = [images_path, models_path, logs_path, imgdir_pure, imgdir_noisy, imgdir_ir, savedir_pure, savedir_noisy,
               cropped_train_images_ir, cropped_train_images_pure, cropped_train_images_noisy]
@@ -249,3 +247,109 @@ sys.stdout = old_stdout
 log_file.close()
 
 #============================================ T E S T =================================================
+
+origin_files_index_size_path_test = {}
+test_img_width, test_img_height = 480, 480
+
+test_model_name = r"C:\Users\user\Documents\ML\models\DEPTH_20200903-132536.model_new"
+
+imgdir = images_path + r"\tests\depth"
+realDataDir = images_path + r"\real_scenes_png"
+ir_imgdir = images_path + r"\tests\ir"
+denoised_dir = images_path + r"\denoised"
+cropped_images = images_path + r"\cropped_tests\depth"
+ir_cropped_images = images_path + r"\cropped_tests\ir"
+denoised_dir = images_path + r"\denoised"
+normalized_dir = images_path + r"\normalized"
+
+pngdir = images_path + r"\real_data"
+noisy_pngoutdir = images_path + r"\tests\depth"
+ir_pngoutdir = images_path + r"\tests\ir"
+
+paths = [imgdir, realDataDir, ir_imgdir, denoised_dir, cropped_images, ir_cropped_images,
+         denoised_dir, normalized_dir, pngdir, noisy_pngoutdir, ir_pngoutdir]
+for path in paths:
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+#================================= S T A R T   T E S T I N G ==========================================
+
+old_stdout = sys.stdout
+try:
+    model = keras.models.load_model(test_model_name)
+except Exception as e:
+    print('Failed to load model %s. Reason: %s' % (test_model_name, e))
+
+
+print('Testing model', str(test_model_name.split('.')[-1]), '..')
+name = logs_path + '/output_' + str(test_model_name.split('.')[-1]) + '.log'
+log_file = open(name, "w")
+sys.stdout = log_file
+print('prediction time : ')
+
+# clean directories before processing
+folders = [cropped_images, ir_cropped_images, denoised_dir]
+for folder in folders:
+    for filename in os.listdir(folder):
+        file_path = os.path.join(folder, filename)
+        try:
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+        except Exception as e:
+            print('Failed to delete %s. Reason: %s' % (file_path, e))
+
+
+filelist = [f for f in glob.glob(imgdir + "**/*" + IMAGE_EXTENSION, recursive=True)]
+ir_filelist = [f for f in glob.glob(ir_imgdir + "**/*" + IMAGE_EXTENSION, recursive=True)]
+total_cropped_images = [0]*len(filelist)
+ir_total_cropped_images = [0]*len(ir_filelist)
+for i,f in enumerate(ir_filelist) :
+    cropped_images, test_img_width, test_img_height, origin_files_index_size_path_test = get_test_data_inputs("ir")
+    ir_total_cropped_images[i] = get_test_split_img(f, i, cropped_images, test_img_width, test_img_height, True, origin_files_index_size_path_test)
+
+for i,f in enumerate(filelist) :
+    cropped_images, test_img_width, test_img_height, origin_files_index_size_path_test = get_test_data_inputs("test")
+    total_cropped_images[i] = get_test_split_img(f, i, cropped_images, test_img_width, test_img_height, False, origin_files_index_size_path_test)
+
+dirs_list = [cropped_images + '/' + dir_ for dir_ in os.listdir(cropped_images)]
+
+for i,directory in enumerate(dirs_list):
+
+    cropped_image_offsets = []
+    ir_cropped_images_file = ir_cropped_images + r'/' + 'left-' + str(directory.split('-')[-1])
+    #test_img_width, test_img_height, channels = self.test_config.get_image_to_array_test_input()
+    samples = image_to_array_test(directory, ir_cropped_images_file, cropped_image_offsets,
+                                                    get_image_to_array_test_input())
+    rolling_frame_num, width, height, origin_file_name = origin_files_index_size_path_test[i]
+    cropped_w, cropped_h = test_img_width, test_img_height
+    whole_image = np.zeros((height, width, channels), dtype="float32")
+
+    t1 = time.perf_counter()
+    for i in range(total_cropped_images[i]):
+        # testing
+        sample = samples[i:i+1]
+        row, col = cropped_image_offsets[i]
+        row, col = int(row), int(col)
+        denoised_image = model.predict(sample)
+        row_end = row + cropped_h
+        col_end = col + cropped_w
+        denoised_row = cropped_h
+        denoised_col = cropped_w
+        if row + cropped_h >= height:
+            row_end = height-1
+            denoised_row = abs(row-row_end)
+        if col + cropped_w >= width:
+            col_end = width-1
+            denoised_col = abs(col - col_end)
+        # combine tested images
+        whole_image[row:row_end, col:col_end]=  denoised_image[:, 0:denoised_row,0:denoised_col, :]
+    t2 = time.perf_counter()
+    print('test: ', directory.split('/')[-1], ': ', t2 - t1, 'seconds')
+    denoised_name = directory.split('/')[-1]
+    outfile = denoised_dir + '/' + denoised_name.split('-')[0] + '' + '_denoised' + IMAGE_EXTENSION
+    whole_image = img_as_uint(whole_image)
+    cv2.imwrite(outfile, whole_image[:,:,0])
+sys.stdout = old_stdout
+log_file.close()

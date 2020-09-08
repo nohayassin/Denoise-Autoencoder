@@ -30,6 +30,7 @@ def autoencoder(network_type, train, test, statistics):
 
     if network_config.CONVERT_RAW_TO_PNG:
         image_processing.raw_to_png(848, 480)
+
     if network_config.TRAIN_DATA:
         network_train.train()
 
