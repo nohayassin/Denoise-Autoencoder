@@ -302,7 +302,6 @@ for filename in os.listdir(test_cropped_images_path):
 noisy_images = [f for f in glob.glob(test_images + "**/res*" + IMAGE_EXTENSION, recursive=True)]
 ir_images = [f for f in glob.glob(test_images + "**/left*" + IMAGE_EXTENSION, recursive=True)]
 
-
 total_cropped_images = [0]*len(noisy_images)
 ir_total_cropped_images = [0]*len(ir_images)
 
@@ -353,9 +352,9 @@ for config in config_list:
 
 ########### IMAGE TO ARRAY  ##################
 cropped_noisy_images = [f for f in glob.glob(test_cropped_images_path + "**/res*" , recursive=True)]
-cropped_ir_images = [f for f in glob.glob(test_cropped_images_path + "**/left*" , recursive=True)]
+#cropped_ir_images = [f for f in glob.glob(test_cropped_images_path + "**/left*" , recursive=True)]
 cropped_noisy_images.sort()
-cropped_ir_images.sort()
+#cropped_ir_images.sort()
 for i,directory in enumerate(cropped_noisy_images):
 
     cropped_image_offsets = []

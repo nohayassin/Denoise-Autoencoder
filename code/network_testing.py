@@ -22,32 +22,12 @@ class NetworkTesting:
 
         if self.test_config.TEST_REAL_DATA:
             self.test_config.imgdir = self.test_config.realDataDir
-
-        # clean directories before processing
-        self.image_config.clean_directory(self.test_config.cropped_images)
-        self.image_config.clean_directory(self.test_config.ir_cropped_images)
-        self.image_config.clean_directory(self.test_config.denoised_dir)
-
-        filelist = [f for f in glob.glob(self.test_config.imgdir + "**/*" + self.test_config.IMAGE_EXTENSION, recursive=True)]
-        ir_filelist = [f for f in glob.glob(self.test_config.ir_imgdir + "**/*" + self.test_config.IMAGE_EXTENSION, recursive=True)]
-        total_cropped_images = [0]*len(filelist)
-        ir_total_cropped_images = [0]*len(ir_filelist)
-
-        ir_config = (ir_filelist, ir_total_cropped_images, self.image_config.ir_cropped_images, self.image_config.test_img_width, self.image_config.test_img_height, True, {})
-        noisy_config = (filelist, total_cropped_images, self.image_config.cropped_images, self.image_config.test_img_width, self.image_config.test_img_height, False, self.image_config.origin_files_index_size_path_test)
-
-        config_list = [ir_config, noisy_config]
-        self.image_config.get_test_split_img(config_list)
-
-        dirs_list = [self.test_config.cropped_images + '/' + dir_ for dir_ in os.listdir(self.test_config.cropped_images)]
-
-        for i,directory in enumerate(dirs_list):
-
+        total_cropped_images = self.image_config.get_test_split_img()
+        cropped_noisy_images = [f for f in glob.glob(self.test_config.test_cropped_images_path + "**/res*", recursive=True)]
+        cropped_noisy_images.sort()
+        for i, directory in enumerate(cropped_noisy_images):
             cropped_image_offsets = []
-            ir_cropped_images_file = self.test_config.ir_cropped_images + r'/' + 'left-' + str(directory.split('-')[-1])
-            #test_img_width, test_img_height, channels = self.test_config.get_image_to_array_test_input()
-            samples = self.image_config.image_to_array_test(directory, ir_cropped_images_file, cropped_image_offsets,
-                                                            self.test_config.get_image_to_array_test_input())
+            samples = self.image_config.image_to_array_test(directory, cropped_image_offsets)
             rolling_frame_num, width, height, origin_file_name = self.test_config.origin_files_index_size_path_test[i]
             cropped_w, cropped_h = self.test_config.test_img_width, self.test_config.test_img_height
             whole_image = np.zeros((height, width, self.test_config.channels), dtype="float32")

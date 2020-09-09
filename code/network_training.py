@@ -11,11 +11,6 @@ class NetworkTraining:
         self.image_config = image_config
         self.network = Network(train_config)
 
-    def load_to_arrays(self, iteration = 0, images_num_to_process = 1):
-        pure_input_train = self.image_config.image_to_array(iteration, images_num_to_process, self.train_config.get_image_to_array_train_input("pure"))
-        noisy_input_train = self.image_config.image_to_array(iteration, images_num_to_process, self.train_config.get_image_to_array_train_input("noisy"))
-        return pure_input_train, noisy_input_train
-
     def train(self):
         # Get the file paths
         kb.clear_session()
@@ -49,7 +44,8 @@ class NetworkTraining:
 
         save_model_name = self.train_config.models_path +'/' + model_name
         images_num_to_process = 1000
-        all_cropped_num = len(os.listdir(self.train_config.cropped_train_images_pure))
+        all_cropped_num = len(
+            os.listdir(self.train_config.train_cropped_images_path)) // 3  # this folder contains cropped images of pure, noisy and ir
         iterations = all_cropped_num // images_num_to_process
         if all_cropped_num % images_num_to_process > 0:
             iterations += 1
@@ -65,7 +61,8 @@ class NetworkTraining:
                     shutil.copytree(self.train_config.load_model_name, save_model_name)
                 compiled_model = keras.models.load_model(save_model_name) # used to continue training old models
 
-            pure_input_train, noisy_input_train = self.load_to_arrays(first_image, images_num_to_process)
+            noisy_input_train, pure_input_train  = self.image_config.image_to_array(first_image, images_num_to_process, self.train_config.train_cropped_images_path)
+            #self.load_to_arrays(first_image, images_num_to_process)
             if self.train_config.OUTPUT_EQUALS_INPUT:
                 pure_input_train = noisy_input_train
 
