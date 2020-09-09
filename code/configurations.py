@@ -83,9 +83,6 @@ class TestConfig(NetworkConfig):
         print("Creating folders for testing process ..")
         self.create_folders()
 
-    def get_image_to_array_test_input(self):
-        return self.test_img_width, self.test_img_height, self.channels
-
 class StatisticsConfig(TestConfig):
     def __init__(self, network_config):
         TestConfig.__init__(self, network_config)

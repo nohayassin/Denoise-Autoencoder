@@ -11,7 +11,6 @@ import glob
 from PIL import Image
 import numpy as np
 import cv2
-from skimage import io as io2
 from skimage import img_as_uint
 
 
@@ -352,9 +351,7 @@ for config in config_list:
 
 ########### IMAGE TO ARRAY  ##################
 cropped_noisy_images = [f for f in glob.glob(test_cropped_images_path + "**/res*" , recursive=True)]
-#cropped_ir_images = [f for f in glob.glob(test_cropped_images_path + "**/left*" , recursive=True)]
 cropped_noisy_images.sort()
-#cropped_ir_images.sort()
 for i,directory in enumerate(cropped_noisy_images):
 
     cropped_image_offsets = []
