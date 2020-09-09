@@ -3,10 +3,10 @@ import os
 class NetworkConfig:
     def __init__(self, train=0, test=0, statistics=0, network_type=0):
 
-        self.root = r"C:\Users\user\Documents\ML"
-        self.images_path = self.root + r"\images"
-        self.models_path = self.root  + r"\models"
-        self.logs_path = self.root  + r"\logs"
+        self.root = r"C:\Users\user\Documents\test_unet_flow"
+        self.images_path = self.root + r"/images"
+        self.models_path = self.root  + r"/models"
+        self.logs_path = self.root  + r"/logs"
         self.paths = [self.images_path, self.models_path, self.logs_path]
         self.create_folders()
 
@@ -24,7 +24,7 @@ class NetworkConfig:
         self.MASK_PURE_DATA = 0 and self.TRAIN_DATA
         self.REMOVE_BACKGROUND = 0 and self.MASK_PURE_DATA
         self.NORMALIZE = 0 and self.MASK_PURE_DATA
-        self.CROP_DATA = (0 or self.MASK_PURE_DATA) and self.TRAIN_DATA
+        self.CROP_DATA = (1 or self.MASK_PURE_DATA) and self.TRAIN_DATA
         self.TEST_REAL_DATA = 0 and self.TEST_DATA
 
         self.OUTPUT_EQUALS_INPUT = 0 and self.TRAIN_DATA
@@ -40,6 +40,7 @@ class NetworkConfig:
     def create_folders(self):
         for path in self.paths:
             if not os.path.exists(path):
+                print("Creating  ", path)
                 os.makedirs(path)
 
 
@@ -50,31 +51,20 @@ class TrainConfig(NetworkConfig):
         self.load_model_name = self.models_path + r"\DEPTH_20200903-132536.model"
         self.LOAD_TRAINED_MODEL = 0 and self.TRAIN_DATA
 
-        self.imgdir_pure = self.images_path + r"\train\pure"
-        self.imgdir_noisy = self.images_path + r"\train\noisy"
-        self.imgdir_ir = self.images_path + r"\train\ir"
-        self.savedir_pure = self.images_path + r"\cropped_images\pure"
-        self.savedir_noisy = self.images_path + r"\cropped_images\noisy"
-        self.cropped_train_images_ir = self.images_path + r"\cropped_images\ir"
-        self.masked_pure = self.images_path + r"\train\masked_pure"
-        self.masked_noisy = self.images_path + r"\train\masked_noisy"
-        self.cropped_train_images_pure = self.images_path + r".\cropped_images\pure"
-        self.cropped_train_images_noisy = self.images_path + r"\cropped_images\noisy"
 
-        self.paths = [self.imgdir_pure, self.imgdir_noisy, self.imgdir_ir, self.savedir_pure, self.savedir_noisy, self.cropped_train_images_ir,
-                 self.masked_pure, self.masked_noisy, self.cropped_train_images_pure , self.cropped_train_images_noisy]
+        self.images_path = self.root + r"/images"
+        self.models_path = self.root + r"/models"
+        self.logs_path = self.root + r"/logs"
+        self.train_images = self.images_path + r"/train"
+        self.train_cropped_images_path = self.images_path + r"/train_cropped"
+        self.masked_pure = self.images_path + r"/train_masked"
+        self.paths = [self.root, self.images_path, self.models_path, self.logs_path, self.train_images, self.masked_pure, self.train_cropped_images_path]
 
+        print("Creating folders for training process ..")
         self.create_folders()
-
 
     def get_mask_pure_inputs(self):
         return self.imgdir_pure, self.imgdir_noisy, self.masked_pure
-
-    def get_image_to_array_train_input(self, type="pure"):
-        if type == "pure":
-            return self.img_width, self.img_height, self.cropped_train_images_pure, self.cropped_train_images_ir, self.channels
-        if type == "noisy":
-            return self.img_width, self.img_height, self.cropped_train_images_noisy, self.cropped_train_images_ir, self.channels
 
 class TestConfig(NetworkConfig):
     def __init__(self, network_config):
