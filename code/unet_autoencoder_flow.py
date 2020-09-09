@@ -256,7 +256,8 @@ test_model_name = r"C:\Users\user\Documents\ML\models\DEPTH_20200903-132536.mode
 
 test_images = images_path + r"\test"
 test_cropped_images_path = images_path + r"\test_cropped"
-paths = [test_images, test_cropped_images_path]
+denoised_dir = images_path + r"\denoised"
+paths = [test_images, test_cropped_images_path, denoised_dir]
 
 for path in paths:
     if not os.path.exists(path):
@@ -318,53 +319,44 @@ for config in config_list:
             # ir images has 3 similar channels, we need only 1 channel
             ii = cv2.imread(file)
             gray_image = cv2.cvtColor(ii, cv2.COLOR_BGR2GRAY)
-            #img = Image.fromarray(np.array(gray_image).astype("uint16"))
-            img = np.array(gray_image).astype("uint16")
+            img = Image.fromarray(np.array(gray_image).astype("uint16"))
+            #img = np.array(gray_image).astype("uint16")
         else:
-            #img = Image.fromarray(np.array(Image.open(file)).astype("uint16"))
-            img = np.array(Image.open(file)).astype("uint16")
+            img = Image.fromarray(np.array(Image.open(file)).astype("uint16"))
+            #img = np.array(Image.open(file)).astype("uint16")
             #cv2.imwrite(r"C:\Users\user\Documents\test_unet_flow\images\im"+str(idx)+".png", img)
 
         width, height = 848, 480 #img.size
         frame_num = 0
         for col_i in range(0, width, w):
             for row_i in range(0, height, h):
-                #crop = img.crop((col_i, row_i, col_i + w, row_i + h))
-                crop = img[row_i:row_i+h, col_i:col_i+w]
-                #crop[0][0] = 255
+                crop = img.crop((col_i, row_i, col_i + w, row_i + h))
+                #crop = img[row_i:row_i+h, col_i:col_i+w]
                 save_to = os.path.join(new_test_cropped_images_path, name + '_{:03}' + '_row_' + str(row_i) + '_col_' + str(col_i) + '_width' + str(w) + '_height' + str(h) + IMAGE_EXTENSION)
-                #crop.save(save_to.format(frame_num))
-                cv2.imwrite(save_to.format(frame_num), crop)
+                crop.save(save_to.format(frame_num))
+                #cv2.imwrite(save_to.format(frame_num), crop)
                 frame_num += 1
             origin_files_index_size_path[idx] = (rolling_frame_num, width, height, file)
 
         total_cropped_images[idx] = frame_num
 
-dirs_list = [cropped_images + '/' + dir_ for dir_ in os.listdir(cropped_images)]
+#dirs_list = [cropped_images + '/' + dir_ for dir_ in os.listdir(cropped_images)]
 
 ########### IMAGE TO ARRAY  ##################
-for i,directory in enumerate(dirs_list):
+cropped_noisy_images = [f for f in glob.glob(test_cropped_images_path + "**/res*" , recursive=True)]
+cropped_ir_images = [f for f in glob.glob(test_cropped_images_path + "**/left*" , recursive=True)]
+cropped_noisy_images.sort()
+cropped_ir_images.sort()
+for i,directory in enumerate(cropped_noisy_images):
 
     cropped_image_offsets = []
-    ir_cropped_images_file = ir_cropped_images + r'/' + 'left-' + str(directory.split('-')[-1])
+    ir_cropped_images_file = test_cropped_images_path + r'/' + 'left-' + str(directory.split('-')[-1])
 
     cropped_w, cropped_h = test_img_width, test_img_height
-    im_files = []
-    ir_im_files = []
-    for fname in os.listdir(directory):
-        path = os.path.join(directory, fname)
-        if os.path.isdir(path):
-            # skip directories
-            continue
-        im_files.append(path)
-    im_files.sort()
+    im_files = [f for f in glob.glob(directory + "**/res*" , recursive=True)]
+    ir_im_files = [f for f in glob.glob(ir_cropped_images_file + "**/left*" , recursive=True)]
 
-    for fname in os.listdir(ir_cropped_images_file):
-        path = os.path.join(ir_cropped_images_file, fname)
-        if os.path.isdir(path):
-            # skip directories
-            continue
-        ir_im_files.append(path)
+    im_files.sort()
     ir_im_files.sort()
 
     for i in range(len(im_files)):
@@ -421,8 +413,8 @@ for i,directory in enumerate(dirs_list):
         # combine tested images
         whole_image[row:row_end, col:col_end]=  denoised_image[:, 0:denoised_row,0:denoised_col, :]
     t2 = time.perf_counter()
-    print('test: ', directory.split('/')[-1], ': ', t2 - t1, 'seconds')
-    denoised_name = directory.split('/')[-1]
+    print('test: ', os.path.basename(directory.split('/')[-1]), ': ', t2 - t1, 'seconds')
+    denoised_name = os.path.basename(directory.split('/')[-1])
     outfile = denoised_dir + '/' + denoised_name.split('-')[0] + '' + '_denoised-' + denoised_name.split('-')[1] + IMAGE_EXTENSION
     whole_image = img_as_uint(whole_image)
     cv2.imwrite(outfile, whole_image[:,:,0])
