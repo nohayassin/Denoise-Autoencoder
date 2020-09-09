@@ -2,7 +2,6 @@ from unet_network import Unet
 from basic_conv_network import Basic
 from ccgan_network import CCGAN
 from convautoencoder import ConvAutoencoder
-import configurations
 
 
 class Network:

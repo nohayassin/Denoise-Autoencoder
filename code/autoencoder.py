@@ -22,10 +22,6 @@ def autoencoder(network_type, train, test, statistics):
 
     if network_config.CROP_DATA:
         print('Cropping training data ..')
-        #train_config.imgdir_pure = train_config.masked_pure
-        #config_list = [(train_config.imgdir_ir, train_config.cropped_train_images_ir, True),
-        #               (train_config.imgdir_pure, train_config.savedir_pure, False),
-        #               (train_config.imgdir_noisy, train_config.savedir_noisy, False)]
         image_processing.get_split_img(train_config.img_width, train_config.img_height)
 
     if network_config.CONVERT_RAW_TO_PNG:
