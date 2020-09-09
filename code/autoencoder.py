@@ -46,8 +46,8 @@ if __name__ == '__main__':
     UNET = 1
     CCGAN = 2
 
-    train = 1
-    test = 0
+    train = 0
+    test = 1
     statistics = 0
 
     autoencoder(UNET, train, test, statistics)

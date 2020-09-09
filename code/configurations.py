@@ -51,7 +51,6 @@ class TrainConfig(NetworkConfig):
         self.load_model_name = self.models_path + r"\DEPTH_20200903-132536.model"
         self.LOAD_TRAINED_MODEL = 0 and self.TRAIN_DATA
 
-
         self.images_path = self.root + r"/images"
         self.models_path = self.root + r"/models"
         self.logs_path = self.root + r"/logs"
@@ -75,21 +74,30 @@ class TestConfig(NetworkConfig):
 
         self.test_model_name = r"C:\Users\user\Documents\ML\models\DEPTH_20200903-132536.model_new"
 
-        self.imgdir = self.images_path + r"\tests\depth"
-        self.realDataDir = self.images_path + r"\real_scenes_png"
-        self.ir_imgdir = self.images_path + r"\tests\ir"
-        self.denoised_dir = self.images_path + r"\denoised"
-        self.cropped_images = self.images_path + r"\cropped_tests\depth"
-        self.ir_cropped_images = self.images_path + r"\cropped_tests\ir"
-        self.normalized_dir = self.images_path + r"\normalized"
-
+        self.test_images = self.images_path + r"/test"
+        self.test_cropped_images_path = self.images_path + r"/test_cropped"
+        self.denoised_dir = self.images_path + r"/denoised"
+        self.paths = [self.test_images, self.test_cropped_images_path, self.denoised_dir]
         self.pngdir = self.images_path + r"\real_data"
-        self.noisy_pngoutdir = self.images_path + r"\tests\depth"
-        self.ir_pngoutdir = self.images_path + r"\tests\ir"
 
-        self.paths = [self.imgdir, self.realDataDir, self.ir_imgdir, self.denoised_dir, self.cropped_images, self.ir_cropped_images,
-                 self.denoised_dir, self.normalized_dir, self.pngdir, self.noisy_pngoutdir, self.ir_pngoutdir]
+        print("Creating folders for testing process ..")
         self.create_folders()
+
+        #self.imgdir = self.images_path + r"\tests\depth"
+        #self.realDataDir = self.images_path + r"\real_scenes_png"
+        #self.ir_imgdir = self.images_path + r"\tests\ir"
+        #self.denoised_dir = self.images_path + r"\denoised"
+        #self.cropped_images = self.images_path + r"\cropped_tests\depth"
+        #self.ir_cropped_images = self.images_path + r"\cropped_tests\ir"
+        #self.normalized_dir = self.images_path + r"\normalized"
+
+        #self.pngdir = self.images_path + r"\real_data"
+        #self.noisy_pngoutdir = self.images_path + r"\tests\depth"
+        #self.ir_pngoutdir = self.images_path + r"\tests\ir"
+
+        #self.paths = [self.imgdir, self.realDataDir, self.ir_imgdir, self.denoised_dir, self.cropped_images, self.ir_cropped_images,
+        #         self.denoised_dir, self.normalized_dir, self.pngdir, self.noisy_pngoutdir, self.ir_pngoutdir]
+        #self.create_folders()
 
     def get_image_to_array_test_input(self):
         return self.test_img_width, self.test_img_height, self.channels
