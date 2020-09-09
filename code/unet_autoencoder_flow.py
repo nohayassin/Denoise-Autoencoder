@@ -22,78 +22,11 @@ models_path = root  + r"\models"
 logs_path = root  + r"\logs"
 train_images = images_path + r"\train"
 train_cropped_images_path = images_path + r"\train_cropped"
-
-#imgdir_pure = images_path + r"\train\pure"
-#imgdir_noisy = images_path + r"\train\noisy"
-#imgdir_ir = images_path + r"\train\ir"
-#savedir_pure = images_path + r"\cropped_images\pure"
-#savedir_noisy = images_path + r"\cropped_images\noisy"
-#cropped_train_images_ir = images_path + r"\cropped_images\ir"
-#cropped_train_images_pure = images_path + r".\cropped_images\pure"
-#cropped_train_images_noisy = images_path + r"\cropped_images\noisy"
-
-#paths = [images_path, models_path, logs_path, imgdir_pure, imgdir_noisy, imgdir_ir, savedir_pure, savedir_noisy,
-#              cropped_train_images_ir, cropped_train_images_pure, cropped_train_images_noisy]
-
 paths = [images_path, models_path, logs_path, train_images, train_cropped_images_path]
 
 for path in paths:
     if not os.path.exists(path):
         os.makedirs(path)
-
-#======================================================================================================
-IMAGE_EXTENSION = '.png'
-
-def image_to_array(iteration, images_num_to_process, cropped_w, cropped_h, cropped_images, ir_images, channels, cropped_image_offsets=[]):
-    im_files, ir_im_files  = [], []
-    ls = os.listdir(cropped_images)
-    ls.sort()
-    limit = iteration+images_num_to_process
-    if iteration+images_num_to_process > len(ls):
-        limit = len(ls)
-
-    for i in range(iteration, limit):
-        path = os.path.join(cropped_images, ls[i])
-        if os.path.isdir(path):
-            # skip directories
-            continue
-        im_files.append(path)
-    ls = os.listdir(ir_images)
-    ls.sort()
-    for i in range(iteration, limit):
-        path = os.path.join(ir_images, ls[i])
-        if os.path.isdir(path):
-            # skip directories
-            continue
-        ir_im_files.append(path)
-
-    im_files.sort()
-    ir_im_files.sort()
-    for i in range(len(im_files)):
-        cropped_image_offsets.append([im_files[i].split('_')[4], im_files[i].split('_')[6]])
-
-    images_plt = [cv2.imread(f, cv2.IMREAD_UNCHANGED) for f in im_files if f.endswith(IMAGE_EXTENSION)]
-    ir_images_plt = [cv2.imread(f, cv2.IMREAD_UNCHANGED) for f in ir_im_files if f.endswith(IMAGE_EXTENSION)]
-
-    images_plt = np.array(images_plt)
-    ir_images_plt = np.array(ir_images_plt)
-    images_plt = images_plt.reshape(images_plt.shape[0], cropped_w, cropped_h, 1)
-    ir_images_plt = ir_images_plt.reshape(ir_images_plt.shape[0], cropped_w, cropped_h, 1)
-
-    im_and_ir = images_plt
-    if channels > 1:
-        im_and_ir = np.stack((images_plt,ir_images_plt), axis=3)
-        im_and_ir = im_and_ir.reshape(im_and_ir.shape[0], cropped_w, cropped_h, channels)
-
-    # convert your lists into a numpy array of size (N, H, W, C)
-    img = np.array(im_and_ir)
-    # Parse numbers as floats
-    img = img.astype('float32')
-
-    # Normalize data : remove average then devide by standard deviation
-    img = (img - np.average(img)) / np.var(img)
-    #img = img / 65535
-    return img
 
 #============================================ T R A I N ===============================================
 # other configuration
@@ -104,6 +37,7 @@ img_width, img_height = 128, 128
 unet_steps_per_epoch = 1700
 unet_epochs = 1
 
+IMAGE_EXTENSION = '.png'
 # Get the file paths
 kb.clear_session()
 gpus = tf.config.experimental.list_physical_devices('GPU')
@@ -249,14 +183,10 @@ for i in range(iterations):
     cropped_ir_images = [f for f in glob.glob(train_cropped_images_path + "**/left*" + IMAGE_EXTENSION, recursive=True)]
 
     cropped_images_list = [(cropped_noisy_images, "noisy"), (cropped_pure_images, "pure")]
-    #pure_input_train = image_to_array(first_image , images_num_to_process, img_width, img_height, cropped_train_images_pure, cropped_train_images_ir, channels)
-    #noisy_input_train = image_to_array(first_image, images_num_to_process, img_width, img_height, cropped_train_images_noisy, cropped_train_images_ir, channels)
-    #def image_to_array(iteration, images_num_to_process, cropped_w, cropped_h, cropped_images, ir_images, channels,cropped_image_offsets=[]):
 
     for curr in cropped_images_list:
         curr_cropped_images, images_type = curr
         im_files, ir_im_files = [], []
-        #ls = os.listdir(cropped_images)
         curr_cropped_images.sort()
 
         limit = first_image + images_num_to_process
@@ -269,7 +199,6 @@ for i in range(iterations):
                 # skip directories
                 continue
             im_files.append(path)
-        #ls = os.listdir(ir_images)
         cropped_ir_images.sort()
 
         for i in range(first_image, limit):
@@ -281,12 +210,8 @@ for i in range(iterations):
 
         im_files.sort()
         ir_im_files.sort()
-        #for i in range(len(im_files)):
-        #    cropped_image_offsets.append([im_files[i].split('_')[4], im_files[i].split('_')[6]])
-
         images_plt = [cv2.imread(f, cv2.IMREAD_UNCHANGED) for f in im_files if f.endswith(IMAGE_EXTENSION)]
         ir_images_plt = [cv2.imread(f, cv2.IMREAD_UNCHANGED) for f in ir_im_files if f.endswith(IMAGE_EXTENSION)]
-
         images_plt = np.array(images_plt)
         ir_images_plt = np.array(ir_images_plt)
         images_plt = images_plt.reshape(images_plt.shape[0], img_width, img_height, 1)
@@ -299,24 +224,15 @@ for i in range(iterations):
 
         # convert your lists into a numpy array of size (N, H, W, C)
         img = np.array(im_and_ir)
-
-        # debug
-        img = img_as_uint(img)
-        cv2.imwrite(root+r"\\tst.png", img[0,: , :, 1])
-
         # Parse numbers as floats
         img = img.astype('float32')
-
         # Normalize data : remove average then devide by standard deviation
         img = (img - np.average(img)) / np.var(img)
-        # img = img / 65535
 
         if images_type == "pure":
             pure_input_train = img
         else:
             noisy_input_train = img
-        #return img
-
 
     # Start training Unet network
     model_checkpoint = ModelCheckpoint(models_path + r"\unet_membrane.hdf5", monitor='loss', verbose=1, save_best_only=True)
@@ -337,20 +253,11 @@ img_width, img_height = test_img_width, test_img_height
 #test_model_name = save_model_name
 test_model_name = r"C:\Users\user\Documents\ML\models\DEPTH_20200903-132536.model_new"
 
-imgdir = images_path + r"\tests\depth"
-realDataDir = images_path + r"\real_scenes_png"
-ir_imgdir = images_path + r"\tests\ir"
-denoised_dir = images_path + r"\denoised"
-cropped_images = images_path + r"\cropped_tests\depth"
-ir_cropped_images = images_path + r"\cropped_tests\ir"
-normalized_dir = images_path + r"\normalized"
 
-pngdir = images_path + r"\real_data"
-noisy_pngoutdir = images_path + r"\tests\depth"
-ir_pngoutdir = images_path + r"\tests\ir"
+test_images = images_path + r"\test"
+test_cropped_images_path = images_path + r"\test_cropped"
+paths = [test_images, test_cropped_images_path]
 
-paths = [imgdir, realDataDir, ir_imgdir, denoised_dir, cropped_images, ir_cropped_images,
-         denoised_dir, normalized_dir, pngdir, noisy_pngoutdir, ir_pngoutdir]
 for path in paths:
     if not os.path.exists(path):
         os.makedirs(path)
@@ -369,62 +276,65 @@ log_file = open(name, "w")
 sys.stdout = log_file
 print('prediction time : ')
 
-# clean directories before processing
-folders = [cropped_images, ir_cropped_images, denoised_dir]
-for folder in folders:
-    for filename in os.listdir(folder):
-        file_path = os.path.join(folder, filename)
-        try:
-            if os.path.isfile(file_path) or os.path.islink(file_path):
-                os.unlink(file_path)
-            elif os.path.isdir(file_path):
-                shutil.rmtree(file_path)
-        except Exception as e:
-            print('Failed to delete %s. Reason: %s' % (file_path, e))
+# clean directory before processing
+for filename in os.listdir(test_cropped_images_path):
+    file_path = os.path.join(test_cropped_images_path, filename)
+    try:
+        if os.path.isfile(file_path) or os.path.islink(file_path):
+            os.unlink(file_path)
+        elif os.path.isdir(file_path):
+            shutil.rmtree(file_path)
+    except Exception as e:
+        print('Failed to delete %s. Reason: %s' % (file_path, e))
 
-filelist = [f for f in glob.glob(imgdir + "**/*" + IMAGE_EXTENSION, recursive=True)]
-ir_filelist = [f for f in glob.glob(ir_imgdir + "**/*" + IMAGE_EXTENSION, recursive=True)]
-total_cropped_images = [0]*len(filelist)
-ir_total_cropped_images = [0]*len(ir_filelist)
+
+noisy_images = [f for f in glob.glob(test_images + "**/res*" + IMAGE_EXTENSION, recursive=True)]
+ir_images = [f for f in glob.glob(test_images + "**/left*" + IMAGE_EXTENSION, recursive=True)]
+
+#filelist = [f for f in glob.glob(imgdir + "**/*" + IMAGE_EXTENSION, recursive=True)]
+#ir_filelist = [f for f in glob.glob(ir_imgdir + "**/*" + IMAGE_EXTENSION, recursive=True)]
+
+total_cropped_images = [0]*len(noisy_images)
+ir_total_cropped_images = [0]*len(ir_images)
 
 ########### SPLIT IMAGES ##################
-ir_config = (ir_filelist, ir_total_cropped_images, ir_cropped_images, test_img_width, test_img_height, True, {})
-noisy_config = (filelist, total_cropped_images, cropped_images, test_img_width, test_img_height, False, origin_files_index_size_path_test)
+ir_config = (ir_images, ir_total_cropped_images, True, {})
+noisy_config = (noisy_images, total_cropped_images, False, origin_files_index_size_path_test)
 config_list = [ir_config, noisy_config]
 
 for config in config_list:
-    filelist, total_cropped_images, cropped_images_dir, cropped_w, cropped_h, is_ir, origin_files_index_size_path = list(config)
+    filelist, total_cropped_images, is_ir, origin_files_index_size_path = list(config)
     for idx, file in enumerate(filelist):
-        w, h = (cropped_w, cropped_h)
+        w, h = (test_img_width, test_img_height)
         rolling_frame_num = 0
         name = os.path.basename(file)
         name = os.path.splitext(name)[0]
 
-        if not os.path.exists(cropped_images_dir + r'/' + name):
-            os.makedirs(cropped_images_dir + r'/' + name)
-            new_cropped_images_dir = cropped_images_dir + r'/' + name
+        if not os.path.exists(test_cropped_images_path + r'/' + name):
+            os.makedirs(test_cropped_images_path + r'/' + name)
+            new_test_cropped_images_path = test_cropped_images_path + r'/' + name
 
         if is_ir:
             # ir images has 3 similar channels, we need only 1 channel
             ii = cv2.imread(file)
             gray_image = cv2.cvtColor(ii, cv2.COLOR_BGR2GRAY)
-            img = Image.fromarray(np.array(gray_image).astype("uint16"))
-            #img = np.array(gray_image).astype("uint16")
+            #img = Image.fromarray(np.array(gray_image).astype("uint16"))
+            img = np.array(gray_image).astype("uint16")
         else:
-            img = Image.fromarray(np.array(Image.open(file)).astype("uint16"))
-            #img = np.array(Image.open(file)).astype("uint16")
+            #img = Image.fromarray(np.array(Image.open(file)).astype("uint16"))
+            img = np.array(Image.open(file)).astype("uint16")
             #cv2.imwrite(r"C:\Users\user\Documents\test_unet_flow\images\im"+str(idx)+".png", img)
 
         width, height = 848, 480 #img.size
         frame_num = 0
         for col_i in range(0, width, w):
             for row_i in range(0, height, h):
-                crop = img.crop((col_i, row_i, col_i + w, row_i + h))
-                #crop = img[row_i:row_i+h, col_i:col_i+w]
+                #crop = img.crop((col_i, row_i, col_i + w, row_i + h))
+                crop = img[row_i:row_i+h, col_i:col_i+w]
                 #crop[0][0] = 255
-                save_to = os.path.join(new_cropped_images_dir, name + '_{:03}' + '_row_' + str(row_i) + '_col_' + str(col_i) + '_width' + str(w) + '_height' + str(h) + IMAGE_EXTENSION)
-                crop.save(save_to.format(frame_num))
-                #cv2.imwrite(save_to.format(frame_num), crop)
+                save_to = os.path.join(new_test_cropped_images_path, name + '_{:03}' + '_row_' + str(row_i) + '_col_' + str(col_i) + '_width' + str(w) + '_height' + str(h) + IMAGE_EXTENSION)
+                #crop.save(save_to.format(frame_num))
+                cv2.imwrite(save_to.format(frame_num), crop)
                 frame_num += 1
             origin_files_index_size_path[idx] = (rolling_frame_num, width, height, file)
 
