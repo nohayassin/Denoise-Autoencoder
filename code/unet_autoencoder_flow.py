@@ -15,17 +15,19 @@ from skimage import io as io2
 from skimage import img_as_uint
 
 
-#============================================ M A I N =================================================
-root = r"C:\Users\user\Documents\test_unet_flow"
-images_path = root + r"\images"
-models_path = root  + r"\models"
-logs_path = root  + r"\logs"
-train_images = images_path + r"\train"
-train_cropped_images_path = images_path + r"\train_cropped"
-paths = [images_path, models_path, logs_path, train_images, train_cropped_images_path]
+#============================================ T R A I N   M A I N ========================================
+root = r"./unet_flow"
+images_path = root + r"/images"
+models_path = root  + r"/models"
+logs_path = root  + r"/logs"
+train_images = images_path + r"/train"
+train_cropped_images_path = images_path + r"/train_cropped"
+paths = [root, images_path, models_path, logs_path, train_images, train_cropped_images_path]
 
+print("Creating folders for training process ..")
 for path in paths:
     if not os.path.exists(path):
+        print("Creating  ", path)
         os.makedirs(path)
 
 #============================================ T R A I N ===============================================
@@ -53,8 +55,8 @@ if gpus:
         # Memory growth must be set before GPUs have been initialized
         print(e)
 
-print('Starting a training process ..')
-print('Preparing training data for CNN ..')
+print("Creating and compiling Unet network .. ")
+
 # save output to logs
 old_stdout = sys.stdout
 timestr = time.strftime("%Y%m%d-%H%M%S")
@@ -64,7 +66,7 @@ log_file = open(name, "w")
 sys.stdout = log_file
 print('Loss function output of model :', model_name, '..')
 
-######## Create a Unet model and compile
+
 input_size = (img_width, img_height, channels)
 inputs = Input(input_size)
 conv1 = Conv2D(64, 3, activation='relu', padding='same', kernel_initializer='he_normal')(inputs)
@@ -109,16 +111,16 @@ conv9 = Conv2D(2, 3, activation='relu', padding='same', kernel_initializer='he_n
 conv10 = Conv2D(channels, 1, activation='sigmoid')(conv9)
 
 model = Model(inputs=inputs, outputs=conv10)
-
 model.compile(optimizer=Adam(lr=1e-4), loss='binary_crossentropy', metrics=['accuracy'])
-
 model.summary()
 compiled_model = model
-######## Model is compiled
 
+print("Unet network is successfully compiled !")
+print('Preparing training data for CNN ..')
 print('Cropping training data ..')
 
 # clean dir
+print("Clean cropped images directory ..")
 for filename in os.listdir(train_cropped_images_path):
     file_path = os.path.join(train_cropped_images_path, filename)
     try:
@@ -134,8 +136,9 @@ cropped_w, cropped_h = img_width, img_height
 noisy_images = [f for f in glob.glob(train_images + "**/res*" + IMAGE_EXTENSION, recursive=True)]
 pure_images = [f for f in glob.glob(train_images + "**/gt*" + IMAGE_EXTENSION, recursive=True)]
 ir_images = [f for f in glob.glob(train_images + "**/left*" + IMAGE_EXTENSION, recursive=True)]
-
 config_list = [(noisy_images, False), (pure_images, False), (ir_images, True)]
+
+print("Cropping training images to size ", cropped_w, cropped_h)
 for config in config_list:
     filelist, is_ir = config
     w, h = (cropped_w, cropped_h)
@@ -143,14 +146,12 @@ for config in config_list:
     for i, file in enumerate(filelist):
         name = os.path.basename(file)
         name = os.path.splitext(name)[0]
-
         if is_ir:
             ii = cv2.imread(file)
             gray_image = cv2.cvtColor(ii, cv2.COLOR_BGR2GRAY)
             img = Image.fromarray(np.array(gray_image).astype("uint16"))
         else:
             img = Image.fromarray(np.array(Image.open(file)).astype("uint16"))
-
         width, height = img.size
         frame_num = 0
         for col_i in range(0, width, w):
@@ -163,7 +164,7 @@ for config in config_list:
                 frame_num += 1
         rolling_frame_num += frame_num
 
-##### all data is cropped
+print("Training images are successfully cropped !")
 
 save_model_name = models_path +'/' + model_name
 images_num_to_process = 1000
@@ -171,6 +172,12 @@ all_cropped_num = len(os.listdir(train_cropped_images_path)) // 3 # this folder 
 iterations = all_cropped_num // images_num_to_process
 if all_cropped_num % images_num_to_process > 0 :
     iterations += 1
+
+print('Starting a training process ..')
+print("Create a 2-channel image from each cropped image and its corresponding IR image :")
+print("Channel 0 : pure or noisy cropped image")
+print("Channel 1 : corresponding IR image")
+print("The new images are the input for Unet network.")
 for i in range(iterations):
     print('*************** Iteration : ', i, '****************')
     first_image = i*images_num_to_process
@@ -235,32 +242,33 @@ for i in range(iterations):
             noisy_input_train = img
 
     # Start training Unet network
-    model_checkpoint = ModelCheckpoint(models_path + r"\unet_membrane.hdf5", monitor='loss', verbose=1, save_best_only=True)
-    #compiled_model.fit(noisy_input_train, pure_input_train, steps_per_epoch=unet_steps_per_epoch, epochs=unet_epochs, callbacks=[model_checkpoint])
+    model_checkpoint = ModelCheckpoint(models_path + r"/unet_membrane.hdf5", monitor='loss', verbose=1, save_best_only=True)
+    compiled_model.fit(noisy_input_train, pure_input_train, steps_per_epoch=unet_steps_per_epoch, epochs=unet_epochs, callbacks=[model_checkpoint])
 
     # save the model
-    #compiled_model.save(save_model_name)
-    #compiled_model = keras.models.load_model(save_model_name)
+    compiled_model.save(save_model_name)
+    compiled_model = keras.models.load_model(save_model_name)
 
 sys.stdout = old_stdout
 log_file.close()
-
-#============================================ T E S T =================================================
+print("Training process is done successfully !")
+print("Check log {} for more details".format(name))
+#============================================ T E S T   M A I N =========================================
 
 origin_files_index_size_path_test = {}
 test_img_width, test_img_height = 480, 480
 img_width, img_height = test_img_width, test_img_height
-#test_model_name = save_model_name
-test_model_name = r"C:\Users\user\Documents\ML\models\DEPTH_20200903-132536.model_new"
+test_model_name = save_model_name
 
-
-test_images = images_path + r"\test"
-test_cropped_images_path = images_path + r"\test_cropped"
-denoised_dir = images_path + r"\denoised"
+test_images = images_path + r"/test"
+test_cropped_images_path = images_path + r"/test_cropped"
+denoised_dir = images_path + r"/denoised"
 paths = [test_images, test_cropped_images_path, denoised_dir]
 
+print("Creating folders for testing process ..")
 for path in paths:
     if not os.path.exists(path):
+        print("Creating  ", path)
         os.makedirs(path)
 
 #================================= S T A R T   T E S T I N G ==========================================
@@ -271,8 +279,10 @@ except Exception as e:
     print('Failed to load model %s. Reason: %s' % (test_model_name, e))
 
 
-print('Testing model', str(test_model_name.split('.')[-1]), '..')
+print('Testing model', str(os.path.basename(test_model_name).split('.')[0]), '..')
 name = logs_path + '/output_' + str(test_model_name.split('.')[-1]) + '.log'
+print("Check log {} for more details".format(name))
+
 log_file = open(name, "w")
 sys.stdout = log_file
 print('prediction time : ')
@@ -292,13 +302,13 @@ for filename in os.listdir(test_cropped_images_path):
 noisy_images = [f for f in glob.glob(test_images + "**/res*" + IMAGE_EXTENSION, recursive=True)]
 ir_images = [f for f in glob.glob(test_images + "**/left*" + IMAGE_EXTENSION, recursive=True)]
 
-#filelist = [f for f in glob.glob(imgdir + "**/*" + IMAGE_EXTENSION, recursive=True)]
-#ir_filelist = [f for f in glob.glob(ir_imgdir + "**/*" + IMAGE_EXTENSION, recursive=True)]
 
 total_cropped_images = [0]*len(noisy_images)
 ir_total_cropped_images = [0]*len(ir_images)
 
 ########### SPLIT IMAGES ##################
+
+print("Crop testing images to sizes of ", test_img_width, test_img_height)
 ir_config = (ir_images, ir_total_cropped_images, True, {})
 noisy_config = (noisy_images, total_cropped_images, False, origin_files_index_size_path_test)
 config_list = [ir_config, noisy_config]
@@ -340,7 +350,6 @@ for config in config_list:
 
         total_cropped_images[idx] = frame_num
 
-#dirs_list = [cropped_images + '/' + dir_ for dir_ in os.listdir(cropped_images)]
 
 ########### IMAGE TO ARRAY  ##################
 cropped_noisy_images = [f for f in glob.glob(test_cropped_images_path + "**/res*" , recursive=True)]
@@ -382,12 +391,8 @@ for i,directory in enumerate(cropped_noisy_images):
     img = img.astype('float32')
 
     # Normalize data : remove average then devide by standard deviation
-    #img = (img - np.average(img)) / np.var(img)
-    #img = img / 65535
-    img = img / 56535
+    img = (img - np.average(img)) / np.var(img)
     samples = img
-
-    ###################################
 
     rolling_frame_num, width, height, origin_file_name = origin_files_index_size_path_test[i]
     cropped_w, cropped_h = test_img_width, test_img_height
@@ -420,3 +425,4 @@ for i,directory in enumerate(cropped_noisy_images):
     cv2.imwrite(outfile, whole_image[:,:,0])
 sys.stdout = old_stdout
 log_file.close()
+print("Testing process is done successfully !")
