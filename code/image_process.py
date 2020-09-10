@@ -249,7 +249,8 @@ class SplitImage:
             # Parse numbers as floats
             img = img.astype('float32')
             # Normalize data : remove average then devide by standard deviation
-            img = (img - np.average(img)) / np.var(img)
+            #img = (img - np.average(img)) / np.var(img)
+            img = img / 65535
             res.append(img)
 
         return res
@@ -290,5 +291,5 @@ class SplitImage:
 
         # Normalize data : remove average then devide by standard deviation
         img = (img - np.average(img)) / np.var(img)
-        # img = img / 65535
+        img = img / 65535
         return img

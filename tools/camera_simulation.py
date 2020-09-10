@@ -1,19 +1,7 @@
 import pyrealsense2 as rs
 import numpy as np
 import cv2
-
-import os, sys, shutil
 import keras
-import time
-import tensorflow as tf
-from keras import backend as kb
-from keras.models import *
-from keras.layers import *
-from keras.optimizers import *
-from keras.callbacks import ModelCheckpoint
-import glob
-from PIL import Image
-import numpy as np
 from skimage import img_as_uint
 
 # Configure depth and color streams

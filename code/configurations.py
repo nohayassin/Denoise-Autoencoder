@@ -3,7 +3,7 @@ import os
 class NetworkConfig:
     def __init__(self, train=0, test=0, statistics=0, network_type=0):
 
-        self.root = r"C:\Users\user\Documents\test_unet_flow"
+        self.root = r"C:\Users\user\Documents\new_ML"
         self.images_path = self.root + r"/images"
         self.models_path = self.root  + r"/models"
         self.logs_path = self.root  + r"/logs"
@@ -24,7 +24,7 @@ class NetworkConfig:
         self.MASK_PURE_DATA = 0 and self.TRAIN_DATA
         self.REMOVE_BACKGROUND = 0 and self.MASK_PURE_DATA
         self.NORMALIZE = 0 and self.MASK_PURE_DATA
-        self.CROP_DATA = (1 or self.MASK_PURE_DATA) and self.TRAIN_DATA
+        self.CROP_DATA = (0 or self.MASK_PURE_DATA) and self.TRAIN_DATA
         self.TEST_REAL_DATA = 0 and self.TEST_DATA
 
         self.OUTPUT_EQUALS_INPUT = 0 and self.TRAIN_DATA
@@ -48,7 +48,7 @@ class TrainConfig(NetworkConfig):
     def __init__(self, network_config):
         NetworkConfig.__init__(self, network_config.TRAIN_DATA, network_config.TEST_DATA, network_config.DIFF_DATA, network_config.MODEL)
 
-        self.load_model_name = self.models_path + r"\DEPTH_20200903-132536.model"
+        self.load_model_name = self.models_path + r"DEPTH_20200908-175850.model"
         self.LOAD_TRAINED_MODEL = 0 and self.TRAIN_DATA
 
         self.images_path = self.root + r"/images"
@@ -72,7 +72,7 @@ class TestConfig(NetworkConfig):
         self.origin_files_index_size_path_test = {}
         self.test_img_width, self.test_img_height = 480, 480
 
-        self.test_model_name = r"C:\Users\user\Documents\ML\models\DEPTH_20200903-132536.model_new"
+        self.test_model_name = r"C:\Users\user\Documents\ML\models\DEPTH_20200908-175850.model"
 
         self.test_images = self.images_path + r"/test"
         self.test_cropped_images_path = self.images_path + r"/test_cropped"
