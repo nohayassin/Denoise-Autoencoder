@@ -39,15 +39,17 @@ def test(noisy_image, ir_image):
     w, h = cropped_w, cropped_h
     for col_i in range(0, width, w):
         for row_i in range(0, height, h):
-            #cropped_ir.append(ir_image.crop((col_i, row_i, col_i + w, row_i + h)))
-            #cropped_noisy.append(noisy_image.crop((col_i, row_i, col_i + w, row_i + h)))
             cropped_ir.append(ir_image[row_i:row_i+h, col_i:col_i+w])
             cropped_noisy.append(noisy_image[row_i:row_i+h, col_i:col_i+w])
+
+    # fill with zero to get size 480x480 for both images
     fill = np.zeros((h, w - cropped_ir[-1].shape[1]), dtype="uint16")
     cropped_ir[-1] = np.hstack((cropped_ir[-1], fill))
     cropped_noisy[-1] = np.hstack((cropped_noisy[-1], fill))
-    ########### IMAGE TO ARRAY  ##################
+
     cropped_image_offsets = [(0,0), (0,480)]
+    whole_image = np.zeros((height, width, channels), dtype="float32")
+
     for i in range(len(cropped_ir)):
         noisy_images_plt = cropped_noisy[i].reshape(1, cropped_w, cropped_h, 1)
         ir_images_plt = cropped_ir[i].reshape(1, cropped_w, cropped_h, 1)
@@ -64,18 +66,15 @@ def test(noisy_image, ir_image):
         img = img / 65535
         sample = img
 
-        whole_image = np.zeros((height, width, channels), dtype="float32")
-
         row, col = cropped_image_offsets[i]
         # Show sample
-        cv2.imwrite(r"C:\work\ML_git\tmp\sample"+str(i)+".png", img_as_uint(sample[0,:,:,0]))
-        cv2.imwrite(r"C:\work\ML_git\tmp\sample" + str(i+10) + ".png", img_as_uint(sample[0, :, :, 1]))
+        #cv2.imwrite(r"C:\work\ML_git\tmp\sample"+str(i)+".png", img_as_uint(sample[0,:,:,0]))
+        #cv2.imwrite(r"C:\work\ML_git\tmp\sample" + str(i+10) + ".png", img_as_uint(sample[0, :, :, 1]))
 
         denoised_image = model.predict(sample)
         # Show predicted
-        cv2.imwrite(r"C:\work\ML_git\tmp\predicted"+str(i)+".png", img_as_uint(denoised_image[0, :, :, 0]))
-        cv2.imwrite(r"C:\work\ML_git\tmp\predicted" + str(i+10) + ".png", img_as_uint(denoised_image[0, :, :, 1]))
-
+        #cv2.imwrite(r"C:\work\ML_git\tmp\predicted"+str(i)+".png", img_as_uint(denoised_image[0, :, :, 0]))
+        #cv2.imwrite(r"C:\work\ML_git\tmp\predicted" + str(i+10) + ".png", img_as_uint(denoised_image[0, :, :, 1]))
 
         row_end = row + cropped_h
         col_end = col + cropped_w
@@ -89,12 +88,10 @@ def test(noisy_image, ir_image):
             denoised_col = abs(col - col_end)
         # combine tested images
         whole_image[row:row_end, col:col_end] = denoised_image[:, 0:denoised_row, 0:denoised_col, :]
-    whole_image = img_as_uint(whole_image)
+        #cv2.imwrite(r"C:\work\ML_git\tmp\whole_image" + str(i) + ".png", img_as_uint(whole_image[:, :, 0]))
+    return  img_as_uint(whole_image[:, :, 0])
+    #cv2.imwrite(r"C:\work\ML_git\tmp\im1.png", whole_image[:, :, 0])
 
-    cv2.imwrite(r"C:\work\ML_git\tmp\im1.png", whole_image[:, :, 0])
-    sys.stdout = old_stdout
-    log_file.close()
-    print("Testing process is done successfully !")
 
 #=============================================================================================================
 try:
@@ -119,7 +116,7 @@ try:
         #depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.03), cv2.COLORMAP_JET)
 
         # Stack both images horizontally
-        images = np.hstack((depth_colormap, predicted_image))
+        images = np.hstack((depth_image, predicted_image))
 
         # Show images
         cv2.namedWindow('RealSense', cv2.WINDOW_AUTOSIZE)
