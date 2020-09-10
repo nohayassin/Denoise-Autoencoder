@@ -28,7 +28,7 @@ pipeline.start(config)
 def predict(noisy_image, ir_image):
     channels = 2
     cropped_w, cropped_h = 480, 480
-    test_model_name = r"../models/DEPTH_20200903-132536.model_new"
+    test_model_name = r"..\models\DEPTH_20200903-132536.model_new"
     model = keras.models.load_model(test_model_name)
 
     ir_image = np.array(ir_image).astype("uint16")
