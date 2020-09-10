@@ -24,7 +24,7 @@ class NetworkConfig:
         self.MASK_PURE_DATA = 0 and self.TRAIN_DATA
         self.REMOVE_BACKGROUND = 0 and self.MASK_PURE_DATA
         self.NORMALIZE = 0 and self.MASK_PURE_DATA
-        self.CROP_DATA = (1 or self.MASK_PURE_DATA) and self.TRAIN_DATA
+        self.CROP_DATA = (0 or self.MASK_PURE_DATA) and self.TRAIN_DATA
         self.TEST_REAL_DATA = 0 and self.TEST_DATA
 
         self.OUTPUT_EQUALS_INPUT = 0 and self.TRAIN_DATA
@@ -49,7 +49,7 @@ class TrainConfig(NetworkConfig):
         NetworkConfig.__init__(self, network_config.TRAIN_DATA, network_config.TEST_DATA, network_config.DIFF_DATA, network_config.MODEL)
 
         self.load_model_name = self.models_path + r"DEPTH_20200908-175850.model"
-        self.LOAD_TRAINED_MODEL = 1 and self.TRAIN_DATA
+        self.LOAD_TRAINED_MODEL = 0 and self.TRAIN_DATA
 
         self.images_path = self.root + r"/images"
         self.models_path = self.root + r"/models"
