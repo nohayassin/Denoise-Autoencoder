@@ -28,7 +28,7 @@ pipeline.start(config)
 def predict(noisy_image, ir_image):
     channels = 2
     cropped_w, cropped_h = 480, 480
-    test_model_name = r"C:\work\OLD ML\expirements_models_denoised\NEW DATA - NO MASK\4443 images\unet model - 100 epochs - strides 1500 - NO mask - Binary - WITH IR - NOT FINISHED\DEPTH_20200903-132536.model_new"
+    test_model_name = r"../models/DEPTH_20200903-132536.model_new"
     model = keras.models.load_model(test_model_name)
 
     ir_image = np.array(ir_image).astype("uint16")
@@ -118,7 +118,7 @@ try:
         # Show images
         cv2.namedWindow('RealSense', cv2.WINDOW_AUTOSIZE)
         cv2.imshow('RealSense', images)
-        cv2.waitKey(5)
+        cv2.waitKey(1)
 
 finally:
 
