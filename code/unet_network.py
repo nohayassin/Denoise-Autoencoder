@@ -4,7 +4,7 @@ from keras.optimizers import *
 from keras.callbacks import ModelCheckpoint
 
 #Unet
-unet_steps_per_epoch = 1200
+unet_steps_per_epoch = 1500
 unet_epochs = 100
 
 class Unet:

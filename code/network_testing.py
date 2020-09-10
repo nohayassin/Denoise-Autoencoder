@@ -53,7 +53,7 @@ class NetworkTesting:
                 whole_image[row:row_end, col:col_end]=  denoised_image[:, 0:denoised_row,0:denoised_col, :]
             t2 = time.perf_counter()
             print('test: ', directory.split('/')[-1], ': ', t2 - t1, 'seconds')
-            denoised_name = directory.split('/')[-1]
+            denoised_name = os.path.basename(directory.split('/')[-1])
             outfile = self.test_config.denoised_dir + '/' + denoised_name.split('-')[0] + '' + '_denoised-' + denoised_name.split('-')[1] + self.test_config.IMAGE_EXTENSION
             whole_image = img_as_uint(whole_image)
             cv2.imwrite(outfile, whole_image[:,:,0])
