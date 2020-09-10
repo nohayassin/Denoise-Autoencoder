@@ -60,37 +60,38 @@ def test(noisy_image, ir_image):
         img = img.astype('float32')
 
         # Normalize data : remove average then devide by standard deviation
-        img = (img - np.average(img)) / np.var(img)
+        #img = (img - np.average(img)) / np.var(img)
+        img = img / 65535
         sample = img
 
         whole_image = np.zeros((height, width, channels), dtype="float32")
 
-        t1 = time.perf_counter()
-        for i in range(total_cropped_images[i]):
-            # testing
-            #sample = samples[i:i + 1]
-            row, col = cropped_image_offsets[i]
-            denoised_image = model.predict(sample)
-            row_end = row + cropped_h
-            col_end = col + cropped_w
-            denoised_row = cropped_h
-            denoised_col = cropped_w
-            if row + cropped_h >= height:
-                row_end = height - 1
-                denoised_row = abs(row - row_end)
-            if col + cropped_w >= width:
-                col_end = width - 1
-                denoised_col = abs(col - col_end)
-            # combine tested images
-            whole_image[row:row_end, col:col_end] = denoised_image[:, 0:denoised_row, 0:denoised_col, :]
-        t2 = time.perf_counter()
-        print('test: ', os.path.basename(directory.split('/')[-1]), ': ', t2 - t1, 'seconds')
-        denoised_name = os.path.basename(directory.split('/')[-1])
-        outfile = denoised_dir + '/' + denoised_name.split('-')[0] + '' + '_denoised-' + denoised_name.split('-')[
-            1] + IMAGE_EXTENSION
-        whole_image = img_as_uint(whole_image)
+        row, col = cropped_image_offsets[i]
+        # Show sample
+        cv2.imwrite(r"C:\work\ML_git\tmp\sample"+str(i)+".png", img_as_uint(sample[0,:,:,0]))
+        cv2.imwrite(r"C:\work\ML_git\tmp\sample" + str(i+10) + ".png", img_as_uint(sample[0, :, :, 1]))
 
-        cv2.imwrite(outfile, whole_image[:, :, 0])
+        denoised_image = model.predict(sample)
+        # Show predicted
+        cv2.imwrite(r"C:\work\ML_git\tmp\predicted"+str(i)+".png", img_as_uint(denoised_image[0, :, :, 0]))
+        cv2.imwrite(r"C:\work\ML_git\tmp\predicted" + str(i+10) + ".png", img_as_uint(denoised_image[0, :, :, 1]))
+
+
+        row_end = row + cropped_h
+        col_end = col + cropped_w
+        denoised_row = cropped_h
+        denoised_col = cropped_w
+        if row + cropped_h >= height:
+            row_end = height - 1
+            denoised_row = abs(row - row_end)
+        if col + cropped_w >= width:
+            col_end = width - 1
+            denoised_col = abs(col - col_end)
+        # combine tested images
+        whole_image[row:row_end, col:col_end] = denoised_image[:, 0:denoised_row, 0:denoised_col, :]
+    whole_image = img_as_uint(whole_image)
+
+    cv2.imwrite(r"C:\work\ML_git\tmp\im1.png", whole_image[:, :, 0])
     sys.stdout = old_stdout
     log_file.close()
     print("Testing process is done successfully !")
