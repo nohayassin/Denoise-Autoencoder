@@ -39,36 +39,18 @@ pip install keras
 ## Files Tree of Images Directory
 ```bash
 .
-├───cropped_images
-│   ├───ir
-│   ├───noisy
-│   └───pure
-├───cropped_tests
-│   ├───depth
-│   │   └───res-*
-│   └───ir
-│       └───left-*
-├───denoised
-├───diff_compare
-│   ├───colored_diff_denoised
-│   ├───colored_diff_tested
-│   ├───diff_denoised
-│   ├───diff_tested
-│   └───logs
-├───normalized
-├───real_scenes_png
-├───real_scenes_raw
-├───tests
-│   ├───depth
-│   ├───ir
-│   ├───masked depth
-│   └───pure
-└───train
-    ├───ir
-    ├───masked_noisy
-    ├───masked_pure
-    ├───noisy
-    └───pure
+├───images
+│   ├───denoised
+│   ├───test
+│   ├───test_cropped
+│   ├───train
+│   ├───train_cropped
+│   └───train_masked
+├───logs
+└───models
+    └───DEPTH_20200910-203131.model
+        ├───assets
+        └───variables
 ```
 
 
