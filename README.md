@@ -36,7 +36,7 @@ pip install keras
 
 
 
-## Files Tree of Images Directory
+## Files Tree of Outputs
 ```bash
 .
 ├───images
