@@ -53,7 +53,7 @@ pip install keras
 
 
 
-## Files Tree of Outputs
+## Files Tree of Autoencoder Application Outputs
 ```bash
 .
 ├───images
