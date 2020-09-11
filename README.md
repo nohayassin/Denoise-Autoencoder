@@ -20,7 +20,7 @@ In this project I trained Conventional, Unet and GAN autoencoder networks on dep
 ![foxdemo](https://github.com/nohayassin/RealSense-ML/blob/master/GAN/3D%20pure-%20100%20epochs%20-%20strides%20200%20-%20erosion%202%20-%20Binary%20-%20NO%20IR.gif)
 
 ### Denoised Depth Frames
-#### The goal is to train the neural network so that denoised frames look as ground truth frames as possible.
+##### The goal is to train the neural network so that denoised frames look as ground truth frames as possible.
 ![foxdemo](https://github.com/nohayassin/RealSense-ML/blob/master/GAN/3D%20denoised-%20100%20epochs%20-%20strides%20200%20-%20erosion%202%20-%20Binary%20-%20NO%20IR.gif)
 
 
