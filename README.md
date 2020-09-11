@@ -25,20 +25,20 @@ In this project I trained Conventional, Unet and GAN autoencoder networks on dep
 
 
 ## Unet Network Training Evolution 
-#### Notice the improvement of Unet network learning process by:
-#### 1. Increasing data set size 
-#### 2. Integrating infra red image as a second channel to depth image
+##### Notice the improvement of Unet network learning process by:
+##### 1. Increasing data set size 
+##### 2. Integrating infra red image as a second channel to depth image
 
 ### Ground Truth Frame
-#### The target frame Unet network should reach
+##### The target frame Unet network should reach
 ![foxdemo](https://github.com/nohayassin/RealSense-ML/blob/master/images/GT-3D.PNG)
 
 ### Noisy Frame
-#### Depth frame as captured by DS5 camera (input to Unet network)
+##### Depth frame as captured by DS5 camera (input to Unet network)
 ![foxdemo](https://github.com/nohayassin/RealSense-ML/blob/master/images/noisy-3D.PNG)
 
 ### Denoised Frame
-#### Output of Unet network after training on the above ground truth and noisy depth frame
+##### Output of Unet network after training on ground truth and noisy depth frame above
 ![foxdemo](https://github.com/nohayassin/RealSense-ML/blob/master/images/Unet%20Evolution.gif)
 
 
