@@ -48,12 +48,9 @@ class TrainConfig(NetworkConfig):
     def __init__(self, network_config):
         NetworkConfig.__init__(self, network_config.TRAIN_DATA, network_config.TEST_DATA, network_config.DIFF_DATA, network_config.MODEL)
 
-        self.load_model_name = self.models_path + r"DEPTH_20200908-175850.model"
-        self.LOAD_TRAINED_MODEL = 0 and self.TRAIN_DATA
+        self.load_model_name = self.models_path + r"/DEPTH_20200910-203131.model"
+        self.LOAD_TRAINED_MODEL = 1 and self.TRAIN_DATA
 
-        self.images_path = self.root + r"/images"
-        self.models_path = self.root + r"/models"
-        self.logs_path = self.root + r"/logs"
         self.train_images = self.images_path + r"/train"
         self.train_cropped_images_path = self.images_path + r"/train_cropped"
         self.masked_pure = self.images_path + r"/train_masked"
@@ -72,7 +69,7 @@ class TestConfig(NetworkConfig):
         self.origin_files_index_size_path_test = {}
         self.test_img_width, self.test_img_height = 480, 480
 
-        self.test_model_name = r"C:\Users\user\Documents\ML\models\DEPTH_20200908-175850.model"
+        self.test_model_name = r"C:\Users\user\Documents\ML\expirements_models_denoised\NEW DATA\4443 images\unet model - 100 epochs - strides 1200 - NO mask - Binary - WITH IR - DEV NORMALIZATION\DEPTH_20200908-175850.model"
 
         self.test_images = self.images_path + r"/test"
         self.test_cropped_images_path = self.images_path + r"/test_cropped"
