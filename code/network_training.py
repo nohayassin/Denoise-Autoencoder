@@ -71,7 +71,11 @@ class NetworkTraining:
             # save the model
             compiled_model.save(save_model_name) # check if using same name is ok
             compiled_model = keras.models.load_model(save_model_name)
-            #model = keras.models.load_model(save_model_name, custom_objects={'keras_custom_loss_function':keras_custom_loss_function})
-
+            tf.io.write_graph(
+                compiled_model.output.graph,
+                self.train_config.models_path,
+                'model.pbtxt',
+                as_text=True,
+            )
         sys.stdout = old_stdout
         log_file.close()
