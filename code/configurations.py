@@ -59,8 +59,6 @@ class TrainConfig(NetworkConfig):
         print("Creating folders for training process ..")
         self.create_folders()
 
-    def get_mask_pure_inputs(self):
-        return self.imgdir_pure, self.imgdir_noisy, self.masked_pure
 
 class TestConfig(NetworkConfig):
     def __init__(self, network_config):

@@ -1,18 +1,20 @@
+import os
 from keras.models import *
 from keras.layers import *
 from keras.optimizers import *
 from keras.callbacks import ModelCheckpoint
+import glob
 
 #Unet
-unet_steps_per_epoch = 1500
 unet_epochs = 100
 
 class Unet:
 
-    def __init__(self,channels, input_size, pretrained_weights=None):
+    def __init__(self,train_cropped_images_path, channels, input_size, pretrained_weights=None):
         self.pretrained_weights = pretrained_weights
         self.input_size = input_size
         self.channels = channels
+        self.train_images_num = len([f for f in glob.glob(train_cropped_images_path+'*/*.png', recursive=True)])//3
 
     def compile(self):
         inputs = Input(self.input_size)
@@ -61,19 +63,17 @@ class Unet:
         conv10 = Conv2D(self.channels, 1, activation='sigmoid')(conv9)
 
         model = Model(inputs=inputs, outputs=conv10)
-
         model.compile(optimizer=Adam(lr=1e-4), loss='binary_crossentropy', metrics=['accuracy'])
-        #model.compile(loss='mse', optimizer='adam', metrics=['mse', 'mae', 'mape'])
-
         model.summary()
-
         if (self.pretrained_weights):
             model.load_weights(self.pretrained_weights)
-
         return model
 
     def train(self, model, noisy_input_train, pure_input_train, path=r"C:\Users\user\Documents\ML\models"):
         model_checkpoint = ModelCheckpoint(path +r"\unet_membrane.hdf5", monitor='loss', verbose=1, save_best_only=True)
-        # model.fit(noisy_input_train, pure_input_train, steps_per_epoch=unet_steps_per_epoch, epochs=unet_epochs, callbacks=[model_checkpoint])
-        model.fit(noisy_input_train, pure_input_train, steps_per_epoch=unet_steps_per_epoch, epochs=unet_epochs,
+
+        steps_per_epoch = self.train_images_num // unet_epochs
+        model.fit(noisy_input_train, pure_input_train,
+                  steps_per_epoch=steps_per_epoch,
+                  epochs=unet_epochs,
                   callbacks=[model_checkpoint])
