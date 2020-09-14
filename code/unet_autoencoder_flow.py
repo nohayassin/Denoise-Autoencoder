@@ -34,8 +34,6 @@ for path in paths:
 channels = 2
 img_width, img_height = 128, 128
 
-#Unet
-unet_steps_per_epoch = 1700
 unet_epochs = 1
 
 IMAGE_EXTENSION = '.png'
@@ -242,7 +240,11 @@ for i in range(iterations):
 
     # Start training Unet network
     model_checkpoint = ModelCheckpoint(models_path + r"/unet_membrane.hdf5", monitor='loss', verbose=1, save_best_only=True)
-    compiled_model.fit(noisy_input_train, pure_input_train, steps_per_epoch=unet_steps_per_epoch, epochs=unet_epochs, callbacks=[model_checkpoint])
+    steps_per_epoch = len(cropped_noisy_images) // unet_epochs
+    model.fit(noisy_input_train, pure_input_train,
+              steps_per_epoch=steps_per_epoch,
+              epochs=unet_epochs,
+              callbacks=[model_checkpoint])
 
     # save the model
     compiled_model.save(save_model_name)
