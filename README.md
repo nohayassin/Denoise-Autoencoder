@@ -50,6 +50,13 @@ Use the package manager [pip](https://pip.pypa.io/en/stable/) to install Keras a
 pip install tensorflow-gpu
 pip install keras
 ```
+#### Installation Versions
+```bash
+Tensorflow - 2.3.0 
+Tensorflow-gpu - 2.2.0
+Keras - 2.4.3
+protobuf - 3.12.2
+```
 
 
 
