@@ -83,8 +83,8 @@ def convert_image(i):
 
 
 try:
+    c = rs.colorizer()
     while True:
-
         # Wait for a coherent pair of frames: depth and color
         frames = pipeline.wait_for_frames()
         depth_frame = frames.get_depth_frame()
@@ -99,7 +99,8 @@ try:
         predicted_image = predict(depth_image, ir_image)
 
         # Stack both images horizontally
-        depth_image = convert_image(depth_image)
+        # depth_image = convert_image(depth_image)
+        depth_image = np.asanyarray(c.process(depth_frame).get_data())
         predicted_image = convert_image(predicted_image)
         images = np.hstack((depth_image, predicted_image))
 
