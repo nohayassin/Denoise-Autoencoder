@@ -15,7 +15,7 @@ pipeline.start(config)
 
 channels = 2
 cropped_w, cropped_h = 480, 480
-test_model_name = rr"..\models\DEPTH_20200903-132536.model_new"
+test_model_name = r"..\models\DEPTH_20200903-132536.model_new"
 t1 = time.perf_counter()
 model = keras.models.load_model(test_model_name)
 t2 = time.perf_counter()

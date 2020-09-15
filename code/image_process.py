@@ -105,18 +105,35 @@ class SplitImage:
                 #cv2.imshow('PURE MASKED', pure_img)
                 io2.imsave(path, pure_img)
 
-    def get_split_img(self, cropped_w, cropped_h):
-        self.clean_directory(self.train_config.train_cropped_images_path)
-        noisy_images = [f for f in glob.glob(self.train_config.train_images + "**/res*" + self.train_config.IMAGE_EXTENSION, recursive=True)]
-        pure_images = [f for f in glob.glob(self.train_config.train_images + "**/gt*" + self.train_config.IMAGE_EXTENSION, recursive=True)]
-        ir_images = [f for f in glob.glob(self.train_config.train_images + "**/left*" + self.train_config.IMAGE_EXTENSION, recursive=True)]
-        config_list = [(noisy_images, False), (pure_images, False), (ir_images, True)]
+    def get_split_img(self, cropped_w, cropped_h, testing= False):
+
+        if testing:
+            self.clean_directory(self.test_config.test_cropped_images_path)
+            noisy_images = [f for f in glob.glob(self.test_config.test_images + "**/res*" + self.test_config.IMAGE_EXTENSION, recursive=True)]
+            ir_images = [f for f in glob.glob(self.test_config.test_images + "**/left*" + self.test_config.IMAGE_EXTENSION, recursive=True)]
+            total_cropped_images = [0] * len(noisy_images)
+            ir_total_cropped_images = [0] * len(ir_images)
+            ir_config = (ir_images, ir_total_cropped_images, True, {})
+            noisy_config = (noisy_images, total_cropped_images, False, self.test_config.origin_files_index_size_path_test)
+            config_list = [ir_config, noisy_config]
+            cropped_images_path = self.test_config.test_cropped_images_path
+        else:
+            self.clean_directory(self.train_config.train_cropped_images_path)
+            noisy_images = [f for f in glob.glob(self.train_config.train_images + "**/res*" + self.train_config.IMAGE_EXTENSION, recursive=True)]
+            ir_images = [f for f in glob.glob(self.train_config.train_images + "**/left*" + self.train_config.IMAGE_EXTENSION, recursive=True)]
+            pure_images = [f for f in glob.glob(self.train_config.train_images + "**/gt*" + self.train_config.IMAGE_EXTENSION, recursive=True)]
+            config_list = [(noisy_images, False), (pure_images, False), (ir_images, True)]
+            cropped_images_path = self.train_config.train_cropped_images_path
 
         print("Cropping training images to size ", cropped_w, cropped_h)
+
         for config in config_list:
-            filelist, is_ir = config
+
+            if testing:
+                filelist, total_cropped_images, is_ir, origin_files_index_size_path = list(config)
+            else:
+                filelist, is_ir = config
             w, h = (cropped_w, cropped_h)
-            rolling_frame_num = 0
             for i, file in enumerate(filelist):
                 name = os.path.basename(file)
                 name = os.path.splitext(name)[0]
@@ -131,68 +148,17 @@ class SplitImage:
                 for col_i in range(0, width, w):
                     for row_i in range(0, height, h):
                         crop = img.crop((col_i, row_i, col_i + w, row_i + h))
-                        save_to = os.path.join(self.train_config.train_cropped_images_path,
+                        save_to = os.path.join(cropped_images_path,
                                                name + '_{:03}' + '_row_' + str(row_i) + '_col_' + str(
                                                    col_i) + '_width' + str(
                                                    w) + '_height' + str(h) + self.train_config.IMAGE_EXTENSION)
                         crop.save(save_to.format(frame_num))
                         frame_num += 1
-                rolling_frame_num += frame_num
+                        if testing: origin_files_index_size_path[i] = (width, height, file)
+                if testing: total_cropped_images[i] = frame_num
+        print("Images are successfully cropped !")
+        if testing: return total_cropped_images
 
-        print("Training images are successfully cropped !")
-
-
-    def get_test_split_img(self):
-        self.clean_directory(self.test_config.test_cropped_images_path)
-        noisy_images = [f for f in glob.glob(self.test_config.test_images + "**/res*" + self.test_config.IMAGE_EXTENSION, recursive=True)]
-        ir_images = [f for f in glob.glob(self.test_config.test_images + "**/left*" + self.test_config.IMAGE_EXTENSION, recursive=True)]
-
-        total_cropped_images = [0] * len(noisy_images)
-        ir_total_cropped_images = [0] * len(ir_images)
-
-        print("Crop testing images to sizes of ", self.test_config.test_img_width, self.test_config.test_img_height)
-        ir_config = (ir_images, ir_total_cropped_images, True, {})
-        noisy_config = (noisy_images, total_cropped_images, False, self.test_config.origin_files_index_size_path_test)
-        config_list = [ir_config, noisy_config]
-
-        for config in config_list:
-            filelist, total_cropped_images, is_ir, origin_files_index_size_path = list(config)
-            for idx, file in enumerate(filelist):
-                w, h = (self.test_config.test_img_width, self.test_config.test_img_height)
-                rolling_frame_num = 0
-                name = os.path.basename(file)
-                name = os.path.splitext(name)[0]
-
-                if not os.path.exists(self.test_config.test_cropped_images_path + r'/' + name):
-                    os.makedirs(self.test_config.test_cropped_images_path + r'/' + name)
-                    new_test_cropped_images_path = self.test_config.test_cropped_images_path + r'/' + name
-
-                if is_ir:
-                    # ir images has 3 similar channels, we need only 1 channel
-                    ii = cv2.imread(file)
-                    gray_image = cv2.cvtColor(ii, cv2.COLOR_BGR2GRAY)
-                    img = Image.fromarray(np.array(gray_image).astype("uint16"))
-                    # img = np.array(gray_image).astype("uint16")
-                else:
-                    img = Image.fromarray(np.array(Image.open(file)).astype("uint16"))
-                    # img = np.array(Image.open(file)).astype("uint16")
-                    # cv2.imwrite(r"C:\Users\user\Documents\test_unet_flow\images\im"+str(idx)+".png", img)
-                width, height = 848, 480  # img.size
-                frame_num = 0
-                for col_i in range(0, width, w):
-                    for row_i in range(0, height, h):
-                        crop = img.crop((col_i, row_i, col_i + w, row_i + h))
-                        # crop = img[row_i:row_i+h, col_i:col_i+w]
-                        save_to = os.path.join(new_test_cropped_images_path,
-                                               name + '_{:03}' + '_row_' + str(row_i) + '_col_' + str(
-                                                   col_i) + '_width' + str(w) + '_height' + str(h) + self.test_config.IMAGE_EXTENSION)
-                        crop.save(save_to.format(frame_num))
-                        # cv2.imwrite(save_to.format(frame_num), crop)
-                        frame_num += 1
-                    origin_files_index_size_path[idx] = (rolling_frame_num, width, height, file)
-
-                total_cropped_images[idx] = frame_num
-        return total_cropped_images
 
     def convert_16bit_to_8bit(file):
         image = cv2.imread(file, cv2.IMREAD_UNCHANGED)

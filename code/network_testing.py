@@ -22,13 +22,13 @@ class NetworkTesting:
 
         if self.test_config.TEST_REAL_DATA:
             self.test_config.imgdir = self.test_config.realDataDir
-        total_cropped_images = self.image_config.get_test_split_img()
+        total_cropped_images = self.image_config.get_split_img(self.test_config.test_img_width, self.test_config.test_img_height, True)
         cropped_noisy_images = [f for f in glob.glob(self.test_config.test_cropped_images_path + "**/res*", recursive=True)]
         cropped_noisy_images.sort()
         for i, directory in enumerate(cropped_noisy_images):
             cropped_image_offsets = []
             samples = self.image_config.image_to_array_test(directory, cropped_image_offsets)
-            rolling_frame_num, width, height, origin_file_name = self.test_config.origin_files_index_size_path_test[i]
+            width, height, origin_file_name = self.test_config.origin_files_index_size_path_test[i]
             cropped_w, cropped_h = self.test_config.test_img_width, self.test_config.test_img_height
             whole_image = np.zeros((height, width, self.test_config.channels), dtype="float32")
 
