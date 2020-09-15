@@ -3,6 +3,7 @@ import numpy as np
 import cv2
 import keras
 from skimage import img_as_uint
+import time
 
 # Configure depth and color streams
 pipeline = rs.pipeline()
@@ -12,13 +13,16 @@ config.enable_stream(rs.stream.infrared, 1, 848, 480, rs.format.y8, 30) # 1 for 
 # Start streaming
 pipeline.start(config)
 
+channels = 2
+cropped_w, cropped_h = 480, 480
+test_model_name = rr"..\models\DEPTH_20200903-132536.model_new"
+t1 = time.perf_counter()
+model = keras.models.load_model(test_model_name)
+t2 = time.perf_counter()
+print('model loading : ', t2 - t1, 'seconds')
 
 def predict(noisy_image, ir_image):
-    channels = 2
-    cropped_w, cropped_h = 480, 480
-    test_model_name = r"..\models\DEPTH_20200903-132536.model_new"
-    model = keras.models.load_model(test_model_name)
-
+    t1 = time.perf_counter()
     ir_image = np.array(ir_image).astype("uint16")
     cropped_ir , cropped_noisy = [], []
     width, height = 848, 480
@@ -32,11 +36,14 @@ def predict(noisy_image, ir_image):
     fill = np.zeros((h, w - cropped_ir[-1].shape[1]), dtype="uint16")
     cropped_ir[-1] = np.hstack((cropped_ir[-1], fill))
     cropped_noisy[-1] = np.hstack((cropped_noisy[-1], fill))
+    t2 = time.perf_counter()
+    print('image cropping : ', t2 - t1, 'seconds')
 
     cropped_image_offsets = [(0,0), (0,480)]
     whole_image = np.zeros((height, width, channels), dtype="float32")
 
     for i in range(len(cropped_ir)):
+        t1 = time.perf_counter()
         noisy_images_plt = cropped_noisy[i].reshape(1, cropped_w, cropped_h, 1)
         ir_images_plt = cropped_ir[i].reshape(1, cropped_w, cropped_h, 1)
         im_and_ir = np.stack((noisy_images_plt, ir_images_plt), axis=3)
@@ -46,11 +53,16 @@ def predict(noisy_image, ir_image):
         img = img.astype('float32')
 
         # Normalize data : remove average then devide by standard deviation
-        #img = (img - np.average(img)) / np.var(img)
         img = img / 65535
         sample = img
         row, col = cropped_image_offsets[i]
+        t2 = time.perf_counter()
+        print('image channeling : ', t2 - t1, 'seconds')
+
+        t1 = time.perf_counter()
         denoised_image = model.predict(sample)
+        t2 = time.perf_counter()
+        print('prediction only : ', t2 - t1, 'seconds')
         row_end = row + cropped_h
         col_end = col + cropped_w
         denoised_row = cropped_h
@@ -96,7 +108,10 @@ try:
         # Convert images to numpy arrays
         depth_image = np.asanyarray(depth_frame.get_data())
         ir_image = np.asanyarray(ir_frame.get_data())
+        t1 = time.perf_counter()
         predicted_image = predict(depth_image, ir_image)
+        t2 = time.perf_counter()
+        print('processing + prediction : ', t2 - t1, 'seconds')
 
         # Stack both images horizontally
         # depth_image = convert_image(depth_image)
