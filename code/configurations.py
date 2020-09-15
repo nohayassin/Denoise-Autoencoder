@@ -67,7 +67,7 @@ class TestConfig(NetworkConfig):
         self.origin_files_index_size_path_test = {}
         self.test_img_width, self.test_img_height = 480, 480
 
-        self.test_model_name = r"C:\Users\user\Documents\ML\expirements_models_denoised\NEW DATA\4443 images\unet model - 100 epochs - strides 1200 - NO mask - Binary - WITH IR - DEV NORMALIZATION\DEPTH_20200908-175850.model"
+        self.test_model_name = r"C:\work\ML_git\Denoise-Autoencoder\models\DEPTH_20200903-132536.model_new"
 
         self.test_images = self.images_path + r"/test"
         self.test_cropped_images_path = self.images_path + r"/test_cropped"
