@@ -60,9 +60,13 @@ protobuf - 3.12.2
 
 ## Usage
 
-Run python autoencoder.py with relevant arguments as clarified below.
-Prepare 2 directories of images : one for training and the other contains images for testing. Pass the directories to autoencoder.py using relevant arguments.
-Set flag -c to crop only if you have new training images.
+Run autoencoder.py with relevant arguments as clarified below.
+
+Prepare 2 directories of images : one for training and the other contains images for testing.
+
+Pass the directories to autoencoder.py using relevant arguments. If no directories are selected, the application will use previous images.
+
+Set flag -c for images cropping only if you have new training images.
 
 ```bash
 usage: Denoise Autoencoder Parser [-h] [-n] [-t] [-s] [-c]
