@@ -11,22 +11,11 @@ class SplitImage:
         self.train_config = train_config
         self.test_config = test_config
 
-    def clean_directory(self, folder):
-        for filename in os.listdir(folder):
-            file_path = os.path.join(folder, filename)
-            try:
-                if os.path.isfile(file_path) or os.path.islink(file_path):
-                    os.unlink(file_path)
-                elif os.path.isdir(file_path):
-                    shutil.rmtree(file_path)
-            except Exception as e:
-                print('Failed to delete %s. Reason: %s' % (file_path, e))
-
     def raw_to_png(self, width, height):
 
         filelist = [f for f in glob.glob(self.test_config.pngdir + "**/*.raw", recursive=True)]
-        self.clean_directory(self.test_config.noisy_pngoutdir)
-        self.clean_directory(self.test_config.ir_pngoutdir)
+        self.network_config.clean_directory(self.test_config.noisy_pngoutdir)
+        self.network_config.clean_directory(self.test_config.ir_pngoutdir)
         ir_count , noisy_count = 0, 0
         for f in filelist:
             outDir = self.test_config.noisy_pngoutdir
@@ -59,8 +48,8 @@ class SplitImage:
 
     def mask_pure_images(self, vars):
         pure_images_dir, noisy_images_dir, masked_pure = vars
-        self.clean_directory(masked_pure)
-        self.clean_directory(self.train_config.masked_noisy)
+        self.network_config.clean_directory(masked_pure)
+        self.network_config.clean_directory(self.train_config.masked_noisy)
         purefilelist = [f for f in glob.glob(pure_images_dir + "**/*" + self.network_config.IMAGE_EXTENSION, recursive=True)]
         purefilelist.sort()
         noisyfilelist = [f for f in glob.glob(noisy_images_dir + "**/*" + self.network_config.IMAGE_EXTENSION, recursive=True)]
@@ -108,7 +97,7 @@ class SplitImage:
     def get_split_img(self, cropped_w, cropped_h, testing= False):
 
         if testing:
-            self.clean_directory(self.test_config.test_cropped_images_path)
+            self.network_config.clean_directory(self.test_config.test_cropped_images_path)
             noisy_images = [f for f in glob.glob(self.test_config.test_images + "**/res*" + self.test_config.IMAGE_EXTENSION, recursive=True)]
             ir_images = [f for f in glob.glob(self.test_config.test_images + "**/left*" + self.test_config.IMAGE_EXTENSION, recursive=True)]
             total_cropped_images = [0] * len(noisy_images)
@@ -117,8 +106,9 @@ class SplitImage:
             noisy_config = (noisy_images, total_cropped_images, False, self.test_config.origin_files_index_size_path_test)
             config_list = [ir_config, noisy_config]
             cropped_images_path = self.test_config.test_cropped_images_path
+
         else:
-            self.clean_directory(self.train_config.train_cropped_images_path)
+            self.network_config.clean_directory(self.train_config.train_cropped_images_path)
             noisy_images = [f for f in glob.glob(self.train_config.train_images + "**/res*" + self.train_config.IMAGE_EXTENSION, recursive=True)]
             ir_images = [f for f in glob.glob(self.train_config.train_images + "**/left*" + self.train_config.IMAGE_EXTENSION, recursive=True)]
             pure_images = [f for f in glob.glob(self.train_config.train_images + "**/gt*" + self.train_config.IMAGE_EXTENSION, recursive=True)]
@@ -137,6 +127,11 @@ class SplitImage:
             for i, file in enumerate(filelist):
                 name = os.path.basename(file)
                 name = os.path.splitext(name)[0]
+
+                if testing and not os.path.exists(self.test_config.test_cropped_images_path + r'/' + name):
+                    os.makedirs(self.test_config.test_cropped_images_path + r'/' + name)
+                    cropped_images_path = self.test_config.test_cropped_images_path + r'/' + name
+
                 if is_ir:
                     ii = cv2.imread(file)
                     gray_image = cv2.cvtColor(ii, cv2.COLOR_BGR2GRAY)

@@ -1,14 +1,14 @@
+import os, sys, argparse
 from image_process import SplitImage
 from image_statistics import *
 from network_testing import *
 from network_training import NetworkTraining
 from configurations import *
 
-def autoencoder(network_type, train, test, statistics):
-    # convert_to_png.raw_to_png(paths.pngDir, paths.pngOutDir, 1280, 720)
-    network_config = NetworkConfig(train=train, test=test, statistics=statistics, network_type=network_type)
-    train_config = TrainConfig(network_config)
-    test_config = TestConfig(network_config)
+def autoencoder(network_type, train, test, statistics, crop, train_img_dir, test_img_dir, keras_model_path):
+    network_config = NetworkConfig(train=train, test=test, statistics=statistics, network_type=network_type, crop=crop)
+    train_config = TrainConfig(network_config, train_img_dir=train_img_dir)
+    test_config = TestConfig(network_config, test_img_dir=test_img_dir, keras_model_path=keras_model_path)
     statistics_config = StatisticsConfig(network_config)
 
     image_processing = SplitImage(network_config, train_config, test_config)
@@ -42,9 +42,26 @@ if __name__ == '__main__':
     UNET = 1
     CCGAN = 2
 
-    train = 1
-    test = 0
-    statistics = 0
+    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser('Denoise Autoencoder Parser')
+    parser.add_argument("-n", "--train", action="store_true", help="train flag")
+    parser.add_argument("-t", "--test", action="store_true", help="test flag")
+    parser.add_argument("-s", "--statistics", action="store_true", help="statistics flag")
+    parser.add_argument("-c", "--crop", action="store_true", help="crop training images")
 
-    autoencoder(UNET, train, test, statistics)
+    # nargs='?' : means 0-or-1 arguments
+    # const=1 : sets the default when there are 0 arguments
+    # type=int : converts the argument to int
+    parser.add_argument('--train_path', nargs='?', const=1, default="", type=str, help="directory for training images")
+    parser.add_argument('--test_path', nargs='?', const=1, default="", type=str, help="directory for images to test")
+    parser.add_argument('--keras_model_path', nargs='?', const=1, default="", type=str, help="Keras model path")
+    args = parser.parse_args()
+
+    print(args.train_path)
+    paths = [args.train_path, args.test_path, args.keras_model_path]
+    for path in paths:
+        if path: print("Test ", path, " ..")
+        if path and not os.path.isdir(path):
+            sys.exit("Invalid directory!")
+    autoencoder(UNET, args.train, args.test, args.statistics, args.crop, args.train_path, args.test_path, args.keras_model_path)
 
