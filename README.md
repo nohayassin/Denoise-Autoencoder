@@ -20,25 +20,25 @@ In this project I trained Conventional, Unet and GAN autoencoder networks on dep
 ![foxdemo](https://github.com/nohayassin/RealSense-ML/blob/master/GAN/3D%20pure-%20100%20epochs%20-%20strides%20200%20-%20erosion%202%20-%20Binary%20-%20NO%20IR.gif)
 
 ### Denoised Depth Frames
-##### The goal is to train the neural network so that denoised frames look as ground truth frames as possible.
+The goal is to train the neural network so that denoised frames look as ground truth frames as possible.
 ![foxdemo](https://github.com/nohayassin/RealSense-ML/blob/master/GAN/3D%20denoised-%20100%20epochs%20-%20strides%20200%20-%20erosion%202%20-%20Binary%20-%20NO%20IR.gif)
 
 
 ## Unet Network Training Evolution 
-##### Notice the improvement of Unet network learning process by:
-##### 1. Increasing data set size 
-##### 2. Integrating infra red image as a second channel to depth image
+Notice the improvement of Unet network learning process by:
+1. Increasing data set size 
+2. Integrating infra red image as a second channel to depth image
 
 ### Ground Truth Depth Frame
-##### The target frame Unet network should reach
+The target frame Unet network should reach
 ![foxdemo](https://github.com/nohayassin/RealSense-ML/blob/master/images/GT-3D.PNG)
 
 ### Noisy Depth Frame
-##### Depth frame as captured by DS5 camera (input to Unet network)
+Depth frame as captured by DS5 camera (input to Unet network)
 ![foxdemo](https://github.com/nohayassin/RealSense-ML/blob/master/images/noisy-3D.PNG)
 
 ### Denoised Depth Frame
-##### Output of Unet network after training on ground truth and noisy depth frame above
+Output of Unet network after training on ground truth and noisy depth frame above
 ![foxdemo](https://github.com/nohayassin/RealSense-ML/blob/master/images/Unet%20Evolution.gif)
 
 
@@ -58,9 +58,31 @@ Keras - 2.4.3
 protobuf - 3.12.2
 ```
 
+## Usage
 
+Run python autoencoder.py with relevant arguments as clarified below.
+Prepare 2 directories of images : one for training and the other contains images for testing. Pass the directories to autoencoder.py using relevant arguments.
+Set flag -c to crop only if you have new training images.
+
+```bash
+usage: Denoise Autoencoder Parser [-h] [-n] [-t] [-s] [-c]
+                                  [--train_path [TRAIN_PATH]]
+                                  [--test_path [TEST_PATH]]
+                                  [--keras_model_path [KERAS_MODEL_PATH]]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -n, --train           train flag
+  -t, --test            test flag
+  -s, --statistics      statistics flag
+  -c, --crop            crop training images
+  --train_path [TRAIN_PATH] directory for training images
+  --test_path [TEST_PATH]  directory for images to test
+  --keras_model_path [KERAS_MODEL_PATH]  Keras model path
+```                    
 
 ## Output File Tree of Autoencoder Application 
+This file tree will be created automatically by the application
 ```bash
 .
 ├───images
