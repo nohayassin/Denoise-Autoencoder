@@ -7,6 +7,7 @@ import tensorflow as tf
 #from tensorflow.python.framework import graph_util
 from tensorflow.python.keras import backend as K
 from tensorflow import keras
+from tensorflow.python.tools.freeze_graph import freeze_graph
 
 def freeze_session(session, keep_var_names=None, output_names=None, clear_devices=True):
     """
@@ -59,11 +60,11 @@ def create_pbtxt():
 
 
 #create_pbtxt()
-#h5_dir = r"C:\Users\user\Documents\new_ML\pbtxt\4"
-#model = keras.models.load_model(h5_dir+ r"\unet_membrane.hdf5")
-#model = keras.models.convert_model(model)
+h5_dir = r"C:\work\ML_git\pb_pbtxt\1"
+model = keras.models.load_model(h5_dir+ r"\unet_membrane.hdf5")
+model = keras.models.convert_model(model)
 
-#frozen_graph = freeze_session(K.get_session(), output_names=[out.op.name for out in model.outputs])
+frozen_graph = freeze_session(K.get_session(), output_names=[out.op.name for out in model.outputs])
 #tf.train.write_graph(frozen_graph, h5_dir, "model.pb", as_text=False)
 #tf.train.write_graph(frozen_graph, h5_dir, "model.pbtxt", as_text=True)
 

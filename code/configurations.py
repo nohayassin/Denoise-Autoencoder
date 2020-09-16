@@ -1,9 +1,11 @@
-import os
+import os, shutil
+from pathlib import Path
 
 class NetworkConfig:
-    def __init__(self, train=0, test=0, statistics=0, network_type=0):
-
-        self.root = r"C:\Users\user\Documents\new_ML"
+    def __init__(self,train=0, test=0, statistics=0, network_type=0, crop=0):
+        # choose a relative path for files directory
+        path = Path(os.path.abspath(os.getcwd()))
+        self.root = str(path.parent.parent)
         self.images_path = self.root + r"/images"
         self.models_path = self.root  + r"/models"
         self.logs_path = self.root  + r"/logs"
@@ -19,12 +21,12 @@ class NetworkConfig:
         # Flags and Parameters
         self.TRAIN_DATA = train
         self.DIFF_DATA = statistics
-        self.TEST_DATA = test and (1 - self.TRAIN_DATA) and (1 - self.DIFF_DATA)
+        self.TEST_DATA = test
 
         self.MASK_PURE_DATA = 0 and self.TRAIN_DATA
         self.REMOVE_BACKGROUND = 0 and self.MASK_PURE_DATA
         self.NORMALIZE = 0 and self.MASK_PURE_DATA
-        self.CROP_DATA = (0 or self.MASK_PURE_DATA) and self.TRAIN_DATA
+        self.CROP_DATA = (crop or self.MASK_PURE_DATA) and self.TRAIN_DATA
         self.TEST_REAL_DATA = 0 and self.TEST_DATA
 
         self.OUTPUT_EQUALS_INPUT = 0 and self.TRAIN_DATA
@@ -45,11 +47,11 @@ class NetworkConfig:
 
 
 class TrainConfig(NetworkConfig):
-    def __init__(self, network_config):
+    def __init__(self, network_config, train_img_dir):
         NetworkConfig.__init__(self, network_config.TRAIN_DATA, network_config.TEST_DATA, network_config.DIFF_DATA, network_config.MODEL)
 
         self.load_model_name = self.models_path + r"/DEPTH_20200910-203131.model"
-        self.LOAD_TRAINED_MODEL = 1 and self.TRAIN_DATA
+        self.LOAD_TRAINED_MODEL = 0 and self.TRAIN_DATA
 
         self.train_images = self.images_path + r"/train"
         self.train_cropped_images_path = self.images_path + r"/train_cropped"
@@ -58,6 +60,18 @@ class TrainConfig(NetworkConfig):
 
         print("Creating folders for training process ..")
         self.create_folders()
+        # copy train images to relative dir :
+        if train_img_dir is not "" and (os.path.abspath(train_img_dir) is not os.path.abspath(self.root)):
+            self.copytree(src=train_img_dir, dst=self.train_images)
+
+    def copytree(self, src, dst, symlinks=False, ignore=None):
+        for item in os.listdir(src):
+            s = os.path.join(src, item)
+            d = os.path.join(dst, item)
+            if os.path.isdir(s):
+                shutil.copytree(s, d, symlinks, ignore)
+            else:
+                shutil.copy2(s, d)
 
 
 class TestConfig(NetworkConfig):
