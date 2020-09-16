@@ -1,11 +1,11 @@
-import os, shutil
+import os, sys, glob, shutil
 from pathlib import Path
 
 class NetworkConfig:
     def __init__(self,train=0, test=0, statistics=0, network_type=0, crop=0):
         # choose a relative path for files directory
         path = Path(os.path.abspath(os.getcwd()))
-        self.root = str(path.parent.parent)
+        self.root = str(path.parent.parent) + r"/autoencoder_files"
         self.images_path = self.root + r"/images"
         self.models_path = self.root  + r"/models"
         self.logs_path = self.root  + r"/logs"
@@ -45,6 +45,26 @@ class NetworkConfig:
                 print("Creating  ", path)
                 os.makedirs(path)
 
+    def copytree(self, src, dst, symlinks=False, ignore=None):
+        for item in os.listdir(src):
+            s = os.path.join(src, item)
+            d = os.path.join(dst, item)
+            if os.path.isdir(s):
+                shutil.copytree(s, d, symlinks, ignore)
+            else:
+                shutil.copy2(s, d)
+
+    def clean_directory(self, folder):
+        for filename in os.listdir(folder):
+            file_path = os.path.join(folder, filename)
+            try:
+                if os.path.isfile(file_path) or os.path.islink(file_path):
+                    os.unlink(file_path)
+                elif os.path.isdir(file_path):
+                    shutil.rmtree(file_path)
+            except Exception as e:
+                print('Failed to delete %s. Reason: %s' % (file_path, e))
+
 
 class TrainConfig(NetworkConfig):
     def __init__(self, network_config, train_img_dir):
@@ -62,39 +82,43 @@ class TrainConfig(NetworkConfig):
         self.create_folders()
         # copy train images to relative dir :
         if train_img_dir is not "" and (os.path.abspath(train_img_dir) is not os.path.abspath(self.root)):
+            self.clean_directory(self.train_images)
             self.copytree(src=train_img_dir, dst=self.train_images)
 
-    def copytree(self, src, dst, symlinks=False, ignore=None):
-        for item in os.listdir(src):
-            s = os.path.join(src, item)
-            d = os.path.join(dst, item)
-            if os.path.isdir(s):
-                shutil.copytree(s, d, symlinks, ignore)
-            else:
-                shutil.copy2(s, d)
+
 
 
 class TestConfig(NetworkConfig):
-    def __init__(self, network_config):
+    def __init__(self, network_config, test_img_dir, keras_model_path):
         NetworkConfig.__init__(self, network_config.TRAIN_DATA, network_config.TEST_DATA, network_config.DIFF_DATA,
                                network_config.MODEL)
         self.origin_files_index_size_path_test = {}
         self.test_img_width, self.test_img_height = 480, 480
-
-        self.test_model_name = r"C:\work\ML_git\Denoise-Autoencoder\models\DEPTH_20200903-132536.model_new"
+        # set keras model to be what the user picked, otherwise search models dir
+        self.test_model_name = keras_model_path
+        if keras_model_path == "" and os.path.isdir(self.models_path):
+            # Find recent model
+            try:
+                self.test_model_name = sorted(glob.glob(os.path.join(self.models_path, '*/')), key=os.path.getmtime)[-1]
+            except IndexError:
+                sys.exit("No Keras model was found! Add a model path to argument: --keras_model_path")
 
         self.test_images = self.images_path + r"/test"
         self.test_cropped_images_path = self.images_path + r"/test_cropped"
         self.denoised_dir = self.images_path + r"/denoised"
         self.paths = [self.test_images, self.test_cropped_images_path, self.denoised_dir]
-        self.pngdir = self.images_path + r"\real_data"
+        self.pngdir = self.images_path + r"/real_data"
 
         print("Creating folders for testing process ..")
         self.create_folders()
+        # copy images to test to relative dir :
+        if test_img_dir is not "" and (os.path.abspath(test_img_dir) is not os.path.abspath(self.root)):
+            self.clean_directory(self.test_images)
+            self.copytree(src=test_img_dir, dst=self.test_images)
 
 class StatisticsConfig(TestConfig):
     def __init__(self, network_config):
-        TestConfig.__init__(self, network_config)
+        TestConfig.__init__(self, network_config, test_img_dir="", keras_model_path="")
         self.diff_denoised_path = self.images_path + r"\diff_compare\diff_denoised"
         self.diff_tested_path = self.images_path + r"\diff_compare\diff_tested"
         self.colored_diff_denoised_path = self.images_path + r"\diff_compare\colored_diff_denoised"
