@@ -89,7 +89,7 @@ class TrainConfig(NetworkConfig):
 
 
 class TestConfig(NetworkConfig):
-    def __init__(self, network_config, test_img_dir, keras_model_path):
+    def __init__(self, network_config, keras_model_path, test_img_dir):
         NetworkConfig.__init__(self, network_config.TRAIN_DATA, network_config.TEST_DATA, network_config.DIFF_DATA,
                                network_config.MODEL)
         self.origin_files_index_size_path_test = {}
@@ -117,8 +117,8 @@ class TestConfig(NetworkConfig):
             self.copytree(src=test_img_dir, dst=self.test_images)
 
 class StatisticsConfig(TestConfig):
-    def __init__(self, network_config):
-        TestConfig.__init__(self, network_config, test_img_dir="", keras_model_path="")
+    def __init__(self, network_config, test_config):
+        TestConfig.__init__(self, network_config, test_config.test_model_name, test_img_dir="")
         self.diff_denoised_path = self.images_path + r"\diff_compare\diff_denoised"
         self.diff_tested_path = self.images_path + r"\diff_compare\diff_tested"
         self.colored_diff_denoised_path = self.images_path + r"\diff_compare\colored_diff_denoised"

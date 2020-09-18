@@ -8,8 +8,8 @@ from configurations import *
 def autoencoder(network_type, train, test, statistics, crop, train_img_dir, test_img_dir, keras_model_path):
     network_config = NetworkConfig(train=train, test=test, statistics=statistics, network_type=network_type, crop=crop)
     train_config = TrainConfig(network_config, train_img_dir=train_img_dir)
-    test_config = TestConfig(network_config, test_img_dir=test_img_dir, keras_model_path=keras_model_path)
-    statistics_config = StatisticsConfig(network_config)
+    test_config = TestConfig(network_config, keras_model_path=keras_model_path, test_img_dir=test_img_dir )
+    statistics_config = StatisticsConfig(network_config, test_config)
 
     image_processing = SplitImage(network_config, train_config, test_config)
     network_train = NetworkTraining(train_config, image_processing)
