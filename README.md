@@ -49,8 +49,7 @@ To install all relevant python packages, run the following command:
 pip install -r "...\requirements.txt"
 ```
 Find requirements.txt in installation folder.
-
-If you have GPU, install Tensofrlow with GPU by using the package manager [pip](https://pip.pypa.io/en/stable/) to install Keras and Tensorflow.
+If you have GPU, install Tensorflow with GPU by using the package manager [pip](https://pip.pypa.io/en/stable/) :
 
 ```bash
 pip install tensorflow-gpu
