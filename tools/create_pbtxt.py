@@ -9,6 +9,7 @@ from tensorflow.python.keras import backend as K
 from tensorflow import keras
 from tensorflow.python.tools.freeze_graph import freeze_graph
 
+
 def freeze_session(session, keep_var_names=None, output_names=None, clear_devices=True):
     """
     Freezes the state of a session into a pruned computation graph.
@@ -25,50 +26,24 @@ def freeze_session(session, keep_var_names=None, output_names=None, clear_device
     @return The frozen graph definition.
     """
     graph = session.graph
+    tf.compat.v1.disable_eager_execution() # could be removed ?
     with graph.as_default():
-        freeze_var_names = list(set(v.op.name for v in tf.global_variables()).difference(keep_var_names or []))
+        freeze_var_names = list(set(v.op.name for v in tf.compat.v1.global_variables()).difference(keep_var_names or []))
         output_names = output_names or []
-        output_names += [v.op.name for v in tf.global_variables()]
+        output_names += [v.op.name for v in tf.compat.v1.global_variables()]
         input_graph_def = graph.as_graph_def()
         if clear_devices:
             for node in input_graph_def.node:
                 node.device = ""
-        frozen_graph = tf.graph_util.convert_variables_to_constants(
-            session, input_graph_def, output_names, freeze_var_names)
+        frozen_graph = tf.compat.v1.graph_util.convert_variables_to_constants(session, input_graph_def, output_names, freeze_var_names)
         return frozen_graph
 
-def create_pbtxt():
-    # necessary !!!
-    tf.compat.v1.disable_eager_execution()
 
-    h5_dir = r"C:\Users\user\Documents\new_ML\pbtxt\4"
-    h5_path = h5_dir+ r"\unet_membrane.hdf5"
-    model = keras.models.load_model(h5_path)
-    # save pb
-    with K.get_session() as sess:
-        output_names = [out.op.name for out in model.outputs]
-        input_graph_def = sess.graph.as_graph_def()
-        for node in input_graph_def.node:
-            node.device = ""
-        #graph = graph_util.remove_training_nodes(input_graph_def)
-        graph = tf.compat.v1.graph_util.remove_training_nodes(input_graph_def)
-        #graph_frozen = graph_util.convert_variables_to_constants(sess, graph, output_names)
-        graph_frozen = tf.compat.v1.graph_util.convert_variables_to_constants(sess, graph, output_names)
-        tf.io.write_graph(graph_frozen, h5_dir, name='model.pb', as_text=False)
-        tf.io.write_graph(graph_frozen, h5_dir, name='model.pbtxt', as_text=True)
-    logging.info("save pb successfully！")
-
-
-#create_pbtxt()
-h5_dir = r"C:\work\ML_git\pb_pbtxt\1"
-model = keras.models.load_model(h5_dir+ r"\unet_membrane.hdf5")
-model = keras.models.convert_model(model)
-
+model = keras.models.load_model(r"C:\work\ML_git\clean_env_autoencoder\tmp\DEPTH_20200903-132536.model_new")
+print(model.output.op.name)
 frozen_graph = freeze_session(K.get_session(), output_names=[out.op.name for out in model.outputs])
-#tf.train.write_graph(frozen_graph, h5_dir, "model.pb", as_text=False)
-#tf.train.write_graph(frozen_graph, h5_dir, "model.pbtxt", as_text=True)
+tf.train.write_graph(frozen_graph, r"C:\work\ML_git\clean_env_autoencoder\tmp", "my_model.pb", as_text=False)
+tf.train.write_graph(frozen_graph, r"C:\work\ML_git\clean_env_autoencoder\tmp", "my_model.pbtxt", as_text=True)
 
-#tf.compat.v1.graph_util.extract_sub_graph(h5_dir+r'\model.pb', h5_dir+r'\model.pbtxt')
-
-cv2.dnn.readNetFromTensorflow(r"C:\Users\user\Documents\new_ML\pbtxt\2\model.pb",
-                              r"C:\Users\user\Documents\new_ML\pbtxt\2\model.pbtxt")
+cv2.dnn.readNetFromTensorflow(r"C:\work\ML_git\clean_env_autoencoder\tmp\my_model.pb",
+                              r"C:\work\ML_git\clean_env_autoencoder\tmp\my_model.pbtxt")

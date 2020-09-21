@@ -15,7 +15,7 @@ pipeline.start(config)
 
 channels = 2
 cropped_w, cropped_h = 480, 480
-test_model_name = r"..\models\DEPTH_20200903-132536.model_new"
+test_model_name = r"C:\work\ML_git\clean_env_autoencoder\tmp\DEPTH_20200903-132536.model_new" #"..\models\DEPTH_20200903-132536.model"
 t1 = time.perf_counter()
 model = keras.models.load_model(test_model_name)
 t2 = time.perf_counter()
@@ -97,17 +97,26 @@ def convert_image(i):
 try:
     c = rs.colorizer()
     while True:
-        # Wait for a coherent pair of frames: depth and color
+        print("==============================================================")
+        t0 = time.perf_counter()
+        # Wait for a coherent pair of frames: depth and ir
+        t1 = time.perf_counter()
         frames = pipeline.wait_for_frames()
         depth_frame = frames.get_depth_frame()
         ir_frame = frames.get_infrared_frame()
+        t2 = time.perf_counter()
+        print('getting depth + ir frames : ', t2 - t1, 'seconds')
 
         if not depth_frame or not ir_frame:
             continue
 
         # Convert images to numpy arrays
+        t1 = time.perf_counter()
         depth_image = np.asanyarray(depth_frame.get_data())
         ir_image = np.asanyarray(ir_frame.get_data())
+        t2 = time.perf_counter()
+        print('convert frames to numpy arrays : ', t2 - t1, 'seconds')
+
         t1 = time.perf_counter()
         predicted_image = predict(depth_image, ir_image)
         t2 = time.perf_counter()
@@ -115,6 +124,7 @@ try:
 
         # Stack both images horizontally
         # depth_image = convert_image(depth_image)
+        t1 = time.perf_counter()
         depth_image = np.asanyarray(c.process(depth_frame).get_data())
         predicted_image = convert_image(predicted_image)
         images = np.hstack((depth_image, predicted_image))
@@ -123,6 +133,9 @@ try:
         cv2.namedWindow('RealSense', cv2.WINDOW_AUTOSIZE)
         cv2.imshow('RealSense', images)
         cv2.waitKey(1)
+        t2 = time.perf_counter()
+        print('show image : ', t2 - t1, 'seconds')
+        print('TOTAL TIME : ', t2 - t0, 'seconds')
 
 finally:
 

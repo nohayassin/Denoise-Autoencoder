@@ -44,7 +44,12 @@ Output of Unet network after training on ground truth and noisy depth frame abov
 
 ## Installation
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install Keras and Tensorflow.
+To install all relevant python packages, run the following command by using the package manager [pip](https://pip.pypa.io/en/stable/) :
+```bash
+pip install -r "...\requirements.txt"
+```
+Find requirements.txt in installation folder.
+If you have GPU, install Tensorflow with GPU:
 
 ```bash
 pip install tensorflow-gpu
@@ -52,10 +57,8 @@ pip install keras
 ```
 #### Versions
 ```bash
-Tensorflow - 2.3.0 
 Tensorflow-gpu - 2.2.0
 Keras - 2.4.3
-protobuf - 3.12.2
 ```
 
 ## Usage
@@ -80,10 +83,36 @@ optional arguments:
   -t, --test            test flag
   -s, --statistics      statistics flag
   -c, --crop            crop training images
-  --train_path [TRAIN_PATH] directory for training images
-  --test_path [TEST_PATH]  directory for images to test
+  --train_path [TRAIN_PATH] training images directory
+  --test_path [TEST_PATH]  testing images directory
   --keras_model_path [KERAS_MODEL_PATH]  Keras model path
 ```                    
+
+## Usage Examples
+#### Crop new images for training
+Nueral Networks cannot train large-size images (e.g 848 x 480), we need to crop each depth and infra red image to optimal squared size so the network could learn all features in each image in optimal way. In Unet Network experiments, image of size 848x480 is cropped to images of size 128x128. 
+Run with flag -c to crop training images. Use this flag only when you have new images to train. 
+```bash
+python autoencoder.py -c --train_path <training images folder>
+```
+#### Train a new model
+To train a new model, prepare images to train then crop them as explained above. It is possible to run one command for cropping images and start a training process.
+Use the flag -n for training :
+```bash
+python autoencoder.py -n -c --train_path <training images folder>
+```
+To train the network again, no need to provide a path for training images again, and of course no need to crop the images again, simply run:
+```bash
+python autoencoder.py -n 
+```
+
+#### Test a model
+To test an existing model, run this command:
+```bash
+python autoencoder.py -t --test_path <testing images folder> --keras_model_path <Keras model path>
+```
+After selecteing images to test and a valid Keras model, the application will put predicted images in the folder images\denoised (see file tree below). If the folder of testing images is empty, denoised folder will stay empty. If no Keras model is provided, the application will check models folder and select most recent model. If models folder is empty, an error will be thrown stating that no Keras model was found.
+Testing images path should be given only when new testing images are added.
 
 ## Output File Tree of Autoencoder Application 
 This file tree will be created automatically by the application

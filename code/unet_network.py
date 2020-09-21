@@ -1,19 +1,16 @@
-import os
 from keras.models import *
 from keras.layers import *
 from keras.optimizers import *
 from keras.callbacks import ModelCheckpoint
 import glob
 
-#Unet
-unet_epochs = 100
-
 class Unet:
 
-    def __init__(self,train_cropped_images_path, channels, input_size, pretrained_weights=None):
+    def __init__(self,train_cropped_images_path, channels, input_size, unet_epochs=100, pretrained_weights=None):
         self.pretrained_weights = pretrained_weights
         self.input_size = input_size
         self.channels = channels
+        self.unet_epochs = unet_epochs
         self.train_images_num = len([f for f in glob.glob(train_cropped_images_path+'*/*.png', recursive=True)])//3
 
     def compile(self):
@@ -72,8 +69,8 @@ class Unet:
     def train(self, model, noisy_input_train, pure_input_train, path=r"C:\Users\user\Documents\ML\models"):
         model_checkpoint = ModelCheckpoint(path +r"\unet_membrane.hdf5", monitor='loss', verbose=1, save_best_only=True)
 
-        steps_per_epoch = self.train_images_num // unet_epochs
+        steps_per_epoch = self.train_images_num // self.unet_epochs
         model.fit(noisy_input_train, pure_input_train,
                   steps_per_epoch=steps_per_epoch,
-                  epochs=unet_epochs,
+                  epochs=self.unet_epochs,
                   callbacks=[model_checkpoint])

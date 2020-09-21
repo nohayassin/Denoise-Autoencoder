@@ -5,8 +5,8 @@ from network_testing import *
 from network_training import NetworkTraining
 from configurations import *
 
-def autoencoder(network_type, train, test, statistics, crop, train_img_dir, test_img_dir, keras_model_path):
-    network_config = NetworkConfig(train=train, test=test, statistics=statistics, network_type=network_type, crop=crop)
+def autoencoder(network_type, train, test, statistics, crop, train_img_dir, test_img_dir, keras_model_path, epochs):
+    network_config = NetworkConfig(train=train, test=test, statistics=statistics, network_type=network_type, crop=crop, epochs=epochs)
     train_config = TrainConfig(network_config, train_img_dir=train_img_dir)
     test_config = TestConfig(network_config, keras_model_path=keras_model_path, test_img_dir=test_img_dir )
     statistics_config = StatisticsConfig(network_config, test_config)
@@ -52,6 +52,7 @@ if __name__ == '__main__':
     # nargs='?' : means 0-or-1 arguments
     # const=1 : sets the default when there are 0 arguments
     # type=int : converts the argument to int
+    parser.add_argument('--epochs', nargs='?', const=1, default=100, type=int, help="epochs number")
     parser.add_argument('--train_path', nargs='?', const=1, default="", type=str, help="directory for training images")
     parser.add_argument('--test_path', nargs='?', const=1, default="", type=str, help="directory for images to test")
     parser.add_argument('--keras_model_path', nargs='?', const=1, default="", type=str, help="Keras model path")
@@ -63,5 +64,4 @@ if __name__ == '__main__':
         if path: print("Test ", path, " ..")
         if path and not os.path.isdir(path):
             sys.exit("Invalid directory!")
-    autoencoder(UNET, args.train, args.test, args.statistics, args.crop, args.train_path, args.test_path, args.keras_model_path)
-
+    autoencoder(UNET, args.train, args.test, args.statistics, args.crop, args.train_path, args.test_path, args.keras_model_path, args.epochs)
