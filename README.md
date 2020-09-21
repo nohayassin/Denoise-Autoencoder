@@ -83,6 +83,7 @@ optional arguments:
   -t, --test            test flag
   -s, --statistics      statistics flag
   -c, --crop            crop training images
+  --epochs [EPOCHS]     epochs number
   --train_path [TRAIN_PATH] training images directory
   --test_path [TEST_PATH]  testing images directory
   --keras_model_path [KERAS_MODEL_PATH]  Keras model path
@@ -104,6 +105,11 @@ python autoencoder.py -n -c --train_path <training images folder>
 To train the network again, no need to provide a path for training images again, and of course no need to crop the images again, simply run:
 ```bash
 python autoencoder.py -n 
+```
+#### Epochs
+Epochs number is set to 100 by default, it could be controlled by the argument "epochs" :
+```bash
+python autoencoder.py -n -c --epochs <epochs number> --train_path <training images folder>
 ```
 
 #### Test a model
