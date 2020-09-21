@@ -87,8 +87,6 @@ class TrainConfig(NetworkConfig):
             self.copytree(src=train_img_dir, dst=self.train_images)
 
 
-
-
 class TestConfig(NetworkConfig):
     def __init__(self, network_config, keras_model_path, test_img_dir):
         NetworkConfig.__init__(self, network_config.TRAIN_DATA, network_config.TEST_DATA, network_config.DIFF_DATA,
