@@ -90,22 +90,23 @@ optional arguments:
 
 ## Usage Examples
 #### Crop new images for training
-Nueral Networks cannot train large-size images (e.g 848 x 480), we need to crop each depth and infra red image to optimal squared size in order so the network could learn all features in each image in optimal way. In these experiments I cropped image of size 848x480 to images of size 128x128. 
+Nueral Networks cannot train large-size images (e.g 848 x 480), we need to crop each depth and infra red image to optimal squared size so the network could learn all features in each image in optimal way. In Unet Network experiments, image of size 848x480 is cropped to images of size 128x128. 
 Run with flag -c to crop training images. Use this flag only when you have new images to train. 
 ```bash
 python autoencoder.py -c --train_path <path of images to train>
 ```
 #### Train a new model
-To train a new model, prepare first the images to train then crop them as explained above. It is possible to select training images folder, cropping them and start a training process in one command. Use the flag -n for training :
+To train a new model, prepare images to train then crop them as explained above. It is possible to run one command for cropping images and start a training process.
+Use the flag -n for training :
 ```bash
 python autoencoder.py -n -c --train_path <path of images to train>
 ```
 #### Test a model
-To test an existed model, run this command:
+To test an existing model, run this command:
 ```bash
 python autoencoder.py -t --test_path <path of images to test> --keras_model_path <path for Keras model>
 ```
-After selecteing images to test and a valid Keras model, the application will put predicted images in the folder images\denoised (see files tree below). If the folder of testing images is empty, denoised folder will stay empty. If no Keras model is provided, the application will check models folder and select most recent model. If models folder is empty, an error will be thrown stating that no Keras model was found.
+After selecteing images to test and a valid Keras model, the application will put predicted images in the folder images\denoised (see file tree below). If the folder of testing images is empty, denoised folder will stay empty. If no Keras model is provided, the application will check models folder and select most recent model. If models folder is empty, an error will be thrown stating that no Keras model was found.
 
 ## Output File Tree of Autoencoder Application 
 This file tree will be created automatically by the application
