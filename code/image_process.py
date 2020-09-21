@@ -1,4 +1,4 @@
-import os, shutil
+import os
 import glob
 from PIL import Image
 import numpy as np

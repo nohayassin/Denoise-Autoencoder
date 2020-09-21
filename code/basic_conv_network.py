@@ -1,10 +1,7 @@
-import keras
 from keras.models import Sequential
 from keras.layers import Conv2D, Conv2DTranspose
 from keras.constraints import max_norm
-from tensorflow.keras.optimizers import Adam
 
-import configurations
 
 # basic model
 no_epochs = 250 #500

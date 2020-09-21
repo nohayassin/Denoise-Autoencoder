@@ -2,7 +2,7 @@ import os, sys, glob, shutil
 from pathlib import Path
 
 class NetworkConfig:
-    def __init__(self,train=0, test=0, statistics=0, network_type=0, crop=0):
+    def __init__(self,train=0, test=0, statistics=0, network_type=0, crop=0, epochs=100):
         # choose a relative path for files directory
         path = Path(os.path.abspath(os.getcwd()))
         self.root = str(path.parent.parent) + r"/autoencoder_files"
@@ -17,6 +17,7 @@ class NetworkConfig:
         self.UNET = 1
         self.CCGAN = 2
         self.MODEL = network_type
+        self.epochs = epochs
 
         # Flags and Parameters
         self.TRAIN_DATA = train
@@ -68,7 +69,7 @@ class NetworkConfig:
 
 class TrainConfig(NetworkConfig):
     def __init__(self, network_config, train_img_dir):
-        NetworkConfig.__init__(self, network_config.TRAIN_DATA, network_config.TEST_DATA, network_config.DIFF_DATA, network_config.MODEL)
+        NetworkConfig.__init__(self, network_config.TRAIN_DATA, network_config.TEST_DATA, network_config.DIFF_DATA, network_config.MODEL, network_config.CROP_DATA, network_config.epochs)
 
         self.load_model_name = self.models_path + r"/DEPTH_20200910-203131.model"
         self.LOAD_TRAINED_MODEL = 0 and self.TRAIN_DATA
@@ -91,7 +92,7 @@ class TrainConfig(NetworkConfig):
 class TestConfig(NetworkConfig):
     def __init__(self, network_config, keras_model_path, test_img_dir):
         NetworkConfig.__init__(self, network_config.TRAIN_DATA, network_config.TEST_DATA, network_config.DIFF_DATA,
-                               network_config.MODEL)
+                               network_config.MODEL, network_config.CROP_DATA, network_config.epochs)
         self.origin_files_index_size_path_test = {}
         self.test_img_width, self.test_img_height = 480, 480
         # set keras model to be what the user picked, otherwise search models dir
