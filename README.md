@@ -44,12 +44,12 @@ Output of Unet network after training on ground truth and noisy depth frame abov
 
 ## Installation
 
-To install all relevant python packages, run the following command:
+To install all relevant python packages, run the following command by using the package manager [pip](https://pip.pypa.io/en/stable/) :
 ```bash
 pip install -r "...\requirements.txt"
 ```
 Find requirements.txt in installation folder.
-If you have GPU, install Tensorflow with GPU by using the package manager [pip](https://pip.pypa.io/en/stable/) :
+If you have GPU, install Tensorflow with GPU:
 
 ```bash
 pip install tensorflow-gpu
