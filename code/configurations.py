@@ -96,7 +96,7 @@ class TestConfig(NetworkConfig):
         self.test_img_width, self.test_img_height = 480, 480
         # set keras model to be what the user picked, otherwise search models dir
         self.test_model_name = keras_model_path
-        if keras_model_path == "" and os.path.isdir(self.models_path):
+        if self.TEST_DATA and keras_model_path == "" and os.path.isdir(self.models_path):
             # Find recent model
             try:
                 self.test_model_name = sorted(glob.glob(os.path.join(self.models_path, '*/')), key=os.path.getmtime)[-1]
