@@ -44,7 +44,13 @@ Output of Unet network after training on ground truth and noisy depth frame abov
 
 ## Installation
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install Keras and Tensorflow.
+To install all relevant python packages, run the following command:
+```bash
+pip install -r "...\requirements.txt"
+```
+Find requirements.txt in installation folder.
+
+If you have GPU, install Tensofrlow with GPU by using the package manager [pip](https://pip.pypa.io/en/stable/) to install Keras and Tensorflow.
 
 ```bash
 pip install tensorflow-gpu
@@ -52,10 +58,8 @@ pip install keras
 ```
 #### Versions
 ```bash
-Tensorflow - 2.3.0 
 Tensorflow-gpu - 2.2.0
 Keras - 2.4.3
-protobuf - 3.12.2
 ```
 
 ## Usage
