@@ -6,8 +6,52 @@ Knowing the exact depth of object in 3D cameras is critical to avoid drones and 
 In this project I'm training Conventional, Unet and GAN autoencoder networks on depth and infra red frames to remove unwanted noises and predict the exact placement of objects in each frame.
 
 
-## Unet Network Architecture
+## Unet Network 
+#### Introduction 
+Unet is a deep learning Architecture used for image segmentation problems
+It was particularly released as a solution for biomedical segmentation tasks
+but it became used for any segmentation problem. Unlike classification problems that use hundred of layers, Unet represent a very compact architecture
+with limited number of parameters.
+self-driving cars for example use image segmentation for awareness about the environment.
+In this project, image segmentation is needed to know the exact depth of each object. 
+Unet network is the ideal architecture that serves our goal.
 
+Unlike image classification that classify the entire image, image segmentation classify every single pixel
+and to what class it belongs to.
+It is not enough to see if some feature is present or not, we need to know the exact shape and all the entricate 
+properities: how each object behaves, the shapes and forms it takes to exactly know which pixels belong to that object.
+
+This kind of task requires the network to have considerably more in-depth understanding about the object.
+Before Unet, segmentation tasks were approched using a modified convolution networks by replacing
+fully connected with fully convolutional layers then they were just upsample it to the same
+resolution of the image and try to use it as a segmentation mask, but because the image was compressed
+so much and it gone through so much processing (e.g max pooling and convolutions) a lot of information have thrown away.
+
+Just doing upsampling will not really give us the fine resolution that we want. It is very
+coarse and not very accurate. so regular upsampling doesn't work very well.
+What Unet does, the first (left) pathway of it looks very similar to classic convolutional network
+instead of just directly upsampling, it has another pathway which it gradually builds upon the up sampling
+procedure, so it serves as directly up sampling via learning the best way that this compressed image should
+be up sampled and using convolution filters for that.
+    
+#### Architecture
+Input image goes through some convolutions, then it is downsampled by using
+max pooling then it goes through more convolutions, downsampled again, and so on until it reaches the deepest layer
+after that it is upsampled by half so we get back the sizes (see image below), then we concatenate the features of each connection 
+and these concatenated features go through some more convolutions, then upsampled then it is joined (concatenated) back 
+with the parallel layer, but we lose information as we go down through max pooling (mostly because it reduces the dimention by half), and
+also through convolution because convolution throw away information from raw input to repupose them into
+meaningful features. That what happens also in classification networks, where a lot of information is 
+thrown away by the last layer. But in segmentation we want those low-level features because those
+are essential to deconstructing the image. 
+
+In the left pathway of Unet, the number of filters (features) increase as we go down, it means that it becomes
+very good at detecting more and more features, the first few layers of a convolution network capture a very small semantic information and lower level
+features, as you go down these features become larger and larger, but when we throw away information the CNN
+knows only approximate location about where those features are.
+When we upsample we get the lost information back (by the concatination process)
+so we can see last-layer features in the perspective of the layer above them.
+    
 ![foxdemo](https://github.com/nohayassin/RealSense-ML/blob/master/images/u-net-architecture.png)
 
 
