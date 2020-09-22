@@ -7,7 +7,7 @@ In this project I'm training Conventional, Unet and GAN autoencoder networks on 
 
 
 ## Unet Network 
-#### Introduction 
+
 Unet is a deep learning Architecture used for image segmentation problems
 It was particularly released as a solution for biomedical segmentation tasks
 but it became used for any segmentation problem. Unlike classification problems that use hundred of layers, Unet represent a very compact architecture
