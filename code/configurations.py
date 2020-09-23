@@ -1,6 +1,5 @@
 import os, sys, glob, shutil
 from pathlib import Path
-from datetime import datetime
 
 class NetworkConfig:
     def __init__(self,train=0, test=0, statistics=0, network_type=0, crop=0, epochs=100):
@@ -8,9 +7,8 @@ class NetworkConfig:
         path = Path(os.path.abspath(os.getcwd()))
         self.root = str(path.parent.parent) + r"/autoencoder_files"
         self.images_path = self.root + r"/images"
-        time_path = datetime.now().strftime("%Y%m%d-%H%M%S")
-        self.models_path = self.root + r"/models/" + time_path
-        self.logs_path = self.root + r"/logs/" + time_path
+        self.models_path = self.root + r"/models"
+        self.logs_path = self.root + r"/logs"
         self.paths = [self.images_path, self.models_path, self.logs_path]
         self.create_folders()
 
@@ -100,7 +98,12 @@ class TestConfig(NetworkConfig):
         if self.TEST_DATA and keras_model_path == "" and os.path.isdir(self.models_path):
             # Find recent model
             try:
-                self.test_model_name = sorted(glob.glob(os.path.join(self.models_path, '*/')), key=os.path.getmtime)[-1]
+                models = sorted(glob.glob(os.path.join(self.models_path, '*/')), key=os.path.getmtime)[-1]
+                sub_dirs = next(os.walk(models))[1]
+                for dir in sub_dirs:
+                    if ".model" in dir:
+                        self.test_model_name = models+ dir
+                        break
             except IndexError:
                 sys.exit("No Keras model was found! Add a model path to argument: --keras_model_path")
 

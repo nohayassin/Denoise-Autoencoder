@@ -15,7 +15,8 @@ class NetworkTesting:
         old_stdout = sys.stdout
         model = keras.models.load_model(self.test_config.test_model_name)
         print('Testing model', str(os.path.basename(self.test_config.test_model_name).split('.')[0]), '..')
-        name = self.test_config.logs_path + '/output_' + str(os.path.basename(os.path.normpath(self.test_config.test_model_name)).split('.')[0]) + '.log'
+        dir_name = str(os.path.basename(os.path.normpath(self.test_config.test_model_name)).split('.')[0]).split('_')[1]
+        name = self.test_config.logs_path + '/' +dir_name +'/testing_output_' + dir_name + '.log'
         log_file = open(name, "w")
         sys.stdout = log_file
         print('prediction time : ')
