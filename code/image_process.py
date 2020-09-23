@@ -106,6 +106,7 @@ class SplitImage:
             noisy_config = (noisy_images, total_cropped_images, False, self.test_config.origin_files_index_size_path_test)
             config_list = [ir_config, noisy_config]
             cropped_images_path = self.test_config.test_cropped_images_path
+            IMAGE_EXTENSION = self.test_config.IMAGE_EXTENSION
 
         else:
             self.network_config.clean_directory(self.train_config.train_cropped_images_path)
@@ -114,6 +115,7 @@ class SplitImage:
             pure_images = [f for f in glob.glob(self.train_config.train_images + "**/gt*" + self.train_config.IMAGE_EXTENSION, recursive=True)]
             config_list = [(noisy_images, False), (pure_images, False), (ir_images, True)]
             cropped_images_path = self.train_config.train_cropped_images_path
+            IMAGE_EXTENSION = self.train_config.IMAGE_EXTENSION
 
         print("Cropping training images to size ", cropped_w, cropped_h)
 
@@ -146,7 +148,7 @@ class SplitImage:
                         save_to = os.path.join(cropped_images_path,
                                                name + '_{:03}' + '_row_' + str(row_i) + '_col_' + str(
                                                    col_i) + '_width' + str(
-                                                   w) + '_height' + str(h) + self.train_config.IMAGE_EXTENSION)
+                                                   w) + '_height' + str(h) + IMAGE_EXTENSION)
                         crop.save(save_to.format(frame_num))
                         frame_num += 1
                         if testing: origin_files_index_size_path[i] = (width, height, file)
@@ -211,7 +213,7 @@ class SplitImage:
             img = img.astype('float32')
             # Normalize data : remove average then devide by standard deviation
             #img = (img - np.average(img)) / np.var(img)
-            img = img / 56535
+            img = img / 65535
             res.append(img)
 
         return res
@@ -252,5 +254,5 @@ class SplitImage:
 
         # Normalize data : remove average then devide by standard deviation
         #img = (img - np.average(img)) / np.var(img)
-        img = img / 56535
+        img = img / 65535
         return img
