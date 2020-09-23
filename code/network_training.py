@@ -1,7 +1,8 @@
 import os, sys, shutil
-import keras
 import time
+from packaging import version
 import tensorflow as tf
+from tensorflow import keras
 from keras import backend as kb
 from networks import Network
 
@@ -12,7 +13,9 @@ class NetworkTraining:
         self.network = Network(train_config)
 
     def train(self):
-        # Get the file paths
+        print("TensorFlow version: ", tf.__version__)
+        assert version.parse(tf.__version__).release[0] >= 2, \
+            "This training requires TensorFlow 2.0 or above."
         kb.clear_session()
         gpus = tf.config.experimental.list_physical_devices('GPU')
         print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU')))
