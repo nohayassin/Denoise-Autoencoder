@@ -43,7 +43,7 @@ class NetworkTraining:
         old_stdout = sys.stdout
         #timestr = time.strftime("%Y%m%d-%H%M%S")
         model_name = 'DEPTH_' + time_path + '.model'
-        name = self.train_config.logs_path + r'/loss_output_' + model_name + '.log'
+        name = self.train_config.logs_path + r'/training_output_' + model_name + '.log'
         log_file = open(name, "w")
         sys.stdout = log_file
         print('Loss function output of model :', model_name, '..')
