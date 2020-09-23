@@ -3,9 +3,6 @@ import numpy as np
 import sys
 from matplotlib import pyplot as plt
 
-filename = r"C:\Users\user\Documents\ML\expirements_models_denoised\unet model - 40 epochs - NO IR\rosbag\res_denoised-0.png" #r"C:\Users\user\Documents\ML\images\denoised\res_denoised-0.png"
-filename = r"C:\Users\user\Documents\ML\images\train\noisy\res-0.png"
-#filename = r"C:\Users\user\Documents\ML\images\diff_compare\diff_denoised\res_denoised_diff-1.png"
 if (len(sys.argv) > 1):
     filename = str(sys.argv[1])
 

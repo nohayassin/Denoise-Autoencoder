@@ -32,6 +32,8 @@ def freeze_session(session, keep_var_names=None, output_names=None, clear_device
         output_names = output_names or []
         output_names += [v.op.name for v in tf.compat.v1.global_variables()]
         input_graph_def = graph.as_graph_def()
+        for node in input_graph_def.node:
+            print(node)
         if clear_devices:
             for node in input_graph_def.node:
                 node.device = ""
@@ -40,7 +42,11 @@ def freeze_session(session, keep_var_names=None, output_names=None, clear_device
 
 
 model = keras.models.load_model(r"C:\work\ML_git\clean_env_autoencoder\tmp\DEPTH_20200903-132536.model_new")
+#model = tf.keras.models.load_model(r"C:\work\ML_git\clean_env_autoencoder\tmp\unet_membrane.hdf5")
 print(model.output.op.name)
+print(model.outputs)
+print(model.inputs)
+
 frozen_graph = freeze_session(K.get_session(), output_names=[out.op.name for out in model.outputs])
 tf.train.write_graph(frozen_graph, r"C:\work\ML_git\clean_env_autoencoder\tmp", "my_model.pb", as_text=False)
 tf.train.write_graph(frozen_graph, r"C:\work\ML_git\clean_env_autoencoder\tmp", "my_model.pbtxt", as_text=True)
