@@ -12,7 +12,7 @@ class Network:
         if self.train_config.MODEL == self.train_config.BASIC:
             return Basic(self.train_config)
         if self.train_config.MODEL == self.train_config.UNET:
-            return Unet(self.train_config.logs_path, self.train_config.train_cropped_images_path, self.train_config.channels, input_size=(self.train_config.img_width, self.train_config.img_height, self.train_config.channels), unet_epochs=self.train_config.epochs, pretrained_weights=None)
+            return Unet(self.train_config.models_path, self.train_config.train_cropped_images_path, self.train_config.channels, input_size=(self.train_config.img_width, self.train_config.img_height, self.train_config.channels), unet_epochs=self.train_config.epochs, pretrained_weights=None)
         if self.train_config.MODEL == self.train_config.CCGAN:
             return CCGAN()
         if self.train_config.MODEL == self.train_config.CONV:

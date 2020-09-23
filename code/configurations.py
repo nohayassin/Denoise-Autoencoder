@@ -8,8 +8,9 @@ class NetworkConfig:
         path = Path(os.path.abspath(os.getcwd()))
         self.root = str(path.parent.parent) + r"/autoencoder_files"
         self.images_path = self.root + r"/images"
-        self.models_path = self.root + r"/models/" + datetime.now().strftime("%Y%m%d-%H%M%S")
-        self.logs_path = self.root + r"/logs/" + datetime.now().strftime("%Y%m%d-%H%M%S")
+        time_path = datetime.now().strftime("%Y%m%d-%H%M%S")
+        self.models_path = self.root + r"/models/" + time_path
+        self.logs_path = self.root + r"/logs/" + time_path
         self.paths = [self.images_path, self.models_path, self.logs_path]
         self.create_folders()
 
