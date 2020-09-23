@@ -1,5 +1,6 @@
 import os, sys, glob, shutil
 from pathlib import Path
+from datetime import datetime
 
 class NetworkConfig:
     def __init__(self,train=0, test=0, statistics=0, network_type=0, crop=0, epochs=100):
@@ -7,8 +8,9 @@ class NetworkConfig:
         path = Path(os.path.abspath(os.getcwd()))
         self.root = str(path.parent.parent) + r"/autoencoder_files"
         self.images_path = self.root + r"/images"
-        self.models_path = self.root  + r"/models"
-        self.logs_path = self.root  + r"/logs"
+        time_path = datetime.now().strftime("%Y%m%d-%H%M%S")
+        self.models_path = self.root + r"/models/" + time_path
+        self.logs_path = self.root + r"/logs/" + time_path
         self.paths = [self.images_path, self.models_path, self.logs_path]
         self.create_folders()
 
@@ -32,12 +34,12 @@ class NetworkConfig:
 
         self.OUTPUT_EQUALS_INPUT = 0 and self.TRAIN_DATA
         self.REMOVE_IR = 0 and self.TRAIN_DATA  # not relevant for now
-        self.IMAGE_EXTENSION = '.png'  # '.tif'#
+        self.IMAGE_EXTENSION = '.png'
         self.CONVERT_RAW_TO_PNG = 0
 
         # other configuration
         self.channels = 2
-        self.img_width, self.img_height = 128, 128  # 64, 64 ##256, 256 #512, 512
+        self.img_width, self.img_height = 128, 128
         self.EROSION_ITERATIONS = 1
 
     def create_folders(self):

@@ -1,12 +1,15 @@
+from tensorflow import keras
 from keras.models import *
 from keras.layers import *
 from keras.optimizers import *
 from keras.callbacks import ModelCheckpoint
 import glob
+from datetime import datetime
 
 class Unet:
 
-    def __init__(self,train_cropped_images_path, channels, input_size, unet_epochs=100, pretrained_weights=None):
+    def __init__(self,logs_path, train_cropped_images_path, channels, input_size, unet_epochs=100, pretrained_weights=None):
+        self.logs_path = logs_path + r'/tensorboard/'
         self.pretrained_weights = pretrained_weights
         self.input_size = input_size
         self.channels = channels
@@ -68,9 +71,13 @@ class Unet:
 
     def train(self, model, noisy_input_train, pure_input_train, path=r"C:\Users\user\Documents\ML\models"):
         model_checkpoint = ModelCheckpoint(path +r"\unet_membrane.hdf5", monitor='loss', verbose=1, save_best_only=True)
+        steps_per_epoch = self.train_images_num // self.unet_epochs + 1 # +1 in case steps_per_epoch is 0
 
-        steps_per_epoch = self.train_images_num // self.unet_epochs
+        # Define the Keras TensorBoard callback.
+        logdir = self.logs_path
+        tensorboard_callback = keras.callbacks.TensorBoard(log_dir=logdir)
+
         model.fit(noisy_input_train, pure_input_train,
                   steps_per_epoch=steps_per_epoch,
                   epochs=self.unet_epochs,
-                  callbacks=[model_checkpoint])
+                  callbacks=[model_checkpoint, tensorboard_callback])
