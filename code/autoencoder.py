@@ -8,13 +8,6 @@ from configurations import *
 def autoencoder(network_type, train, test, statistics, crop, train_img_dir, test_img_dir, keras_model_path, epochs):
     network_config = NetworkConfig(train=train, test=test, statistics=statistics, network_type=network_type, crop=crop, epochs=epochs)
     train_config = TrainConfig(network_config, train_img_dir=train_img_dir)
-    test_config = TestConfig(network_config, keras_model_path=keras_model_path, test_img_dir=test_img_dir )
-    statistics_config = StatisticsConfig(network_config, test_config)
-
-    image_processing = SplitImage(network_config, train_config, test_config)
-    network_train = NetworkTraining(train_config, image_processing)
-    network_test = NetworkTesting(test_config, image_processing)
-    statistics = Statistics(statistics_config, image_processing)
 
     if network_config.MASK_PURE_DATA:
         image_processing.mask_pure_images(train_config.get_mask_pure_inputs())
@@ -28,12 +21,20 @@ def autoencoder(network_type, train, test, statistics, crop, train_img_dir, test
         image_processing.raw_to_png(848, 480)
 
     if network_config.TRAIN_DATA:
+
+        image_processing = SplitImage(network_config, train_config, None)
+        network_train = NetworkTraining(train_config, image_processing)
         network_train.train()
 
     if network_config.TEST_DATA:
+        test_config = TestConfig(network_config, keras_model_path=keras_model_path, test_img_dir=test_img_dir)
+        image_processing = SplitImage(network_config, None, test_config)
+        network_test = NetworkTesting(test_config, image_processing)
         network_test.test()
 
     if network_config.DIFF_DATA:
+        statistics_config = StatisticsConfig(network_config, test_config)
+        statistics = Statistics(statistics_config, image_processing)
         statistics.calc_diff()
 
 
