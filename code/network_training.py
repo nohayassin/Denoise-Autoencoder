@@ -4,6 +4,7 @@ from packaging import version
 import tensorflow as tf
 from tensorflow import keras
 from keras import backend as kb
+from datetime import datetime
 from networks import Network
 
 class NetworkTraining:
@@ -32,10 +33,16 @@ class NetworkTraining:
 
         print('Starting a training process ..')
         print('Preparing training data for CNN ..')
+
+        time_path = datetime.now().strftime("%Y%m%d-%H%M%S")
+        self.train_config.models_path += r"/"+time_path
+        self.train_config.logs_path += r"/" + time_path
+        self.train_config.paths = [self.train_config.models_path, self.train_config.logs_path]
+        self.train_config.create_folders()
         # save output to logs
         old_stdout = sys.stdout
-        timestr = time.strftime("%Y%m%d-%H%M%S")
-        model_name = 'DEPTH_' + timestr + '.model'
+        #timestr = time.strftime("%Y%m%d-%H%M%S")
+        model_name = 'DEPTH_' + time_path + '.model'
         name = self.train_config.logs_path + r'/loss_output_' + model_name + '.log'
         log_file = open(name, "w")
         sys.stdout = log_file
