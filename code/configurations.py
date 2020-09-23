@@ -87,8 +87,6 @@ class TrainConfig(NetworkConfig):
             self.copytree(src=train_img_dir, dst=self.train_images)
 
 
-
-
 class TestConfig(NetworkConfig):
     def __init__(self, network_config, keras_model_path, test_img_dir):
         NetworkConfig.__init__(self, network_config.TRAIN_DATA, network_config.TEST_DATA, network_config.DIFF_DATA,
@@ -97,7 +95,7 @@ class TestConfig(NetworkConfig):
         self.test_img_width, self.test_img_height = 480, 480
         # set keras model to be what the user picked, otherwise search models dir
         self.test_model_name = keras_model_path
-        if keras_model_path == "" and os.path.isdir(self.models_path):
+        if self.TEST_DATA and keras_model_path == "" and os.path.isdir(self.models_path):
             # Find recent model
             try:
                 self.test_model_name = sorted(glob.glob(os.path.join(self.models_path, '*/')), key=os.path.getmtime)[-1]
