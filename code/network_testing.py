@@ -17,6 +17,10 @@ class NetworkTesting:
         print('Testing model', str(os.path.basename(self.test_config.test_model_name).split('.')[0]), '..')
         dir_name = str(os.path.basename(os.path.normpath(self.test_config.test_model_name)).split('.')[0]).split('_')[1]
         name = self.test_config.logs_path + '/' +dir_name +'/testing_output_' + dir_name + '.log'
+        if not os.path.isdir(os.path.dirname(name)):
+            self.test_config.paths = [os.path.dirname(name)]
+            self.test_config.create_folders()
+
         log_file = open(name, "w")
         sys.stdout = log_file
         print('prediction time : ')

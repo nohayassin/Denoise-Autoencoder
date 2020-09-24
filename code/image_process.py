@@ -98,8 +98,8 @@ class SplitImage:
 
         if testing:
             self.network_config.clean_directory(self.test_config.test_cropped_images_path)
-            noisy_images = [f for f in glob.glob(self.test_config.test_images + "**/res*" + self.test_config.IMAGE_EXTENSION, recursive=True)]
-            ir_images = [f for f in glob.glob(self.test_config.test_images + "**/left*" + self.test_config.IMAGE_EXTENSION, recursive=True)]
+            noisy_images = [f for f in glob.glob(self.test_config.test_images + "/res*" + self.test_config.IMAGE_EXTENSION, recursive=False)]
+            ir_images = [f for f in glob.glob(self.test_config.test_images + "/left*" + self.test_config.IMAGE_EXTENSION, recursive=False)]
             total_cropped_images = [0] * len(noisy_images)
             ir_total_cropped_images = [0] * len(ir_images)
             ir_config = (ir_images, ir_total_cropped_images, True, {})
@@ -110,9 +110,9 @@ class SplitImage:
 
         else:
             self.network_config.clean_directory(self.train_config.train_cropped_images_path)
-            noisy_images = [f for f in glob.glob(self.train_config.train_images + "**/res*" + self.train_config.IMAGE_EXTENSION, recursive=True)]
-            ir_images = [f for f in glob.glob(self.train_config.train_images + "**/left*" + self.train_config.IMAGE_EXTENSION, recursive=True)]
-            pure_images = [f for f in glob.glob(self.train_config.train_images + "**/gt*" + self.train_config.IMAGE_EXTENSION, recursive=True)]
+            noisy_images = [f for f in glob.glob(self.train_config.train_images + "/res*" + self.train_config.IMAGE_EXTENSION, recursive=False)]
+            ir_images = [f for f in glob.glob(self.train_config.train_images + "/left*" + self.train_config.IMAGE_EXTENSION, recursive=False)]
+            pure_images = [f for f in glob.glob(self.train_config.train_images + "/gt*" + self.train_config.IMAGE_EXTENSION, recursive=False)]
             config_list = [(noisy_images, False), (pure_images, False), (ir_images, True)]
             cropped_images_path = self.train_config.train_cropped_images_path
             IMAGE_EXTENSION = self.train_config.IMAGE_EXTENSION
@@ -163,9 +163,9 @@ class SplitImage:
 
     def image_to_array(self, iteration, images_num_to_process, cropped_images_path):
         ### convert cropped images to arrays
-        cropped_noisy_images = [f for f in glob.glob(cropped_images_path + "**/res*" + self.network_config.IMAGE_EXTENSION, recursive=True)]
-        cropped_ir_images = [f for f in glob.glob(cropped_images_path + "**/left*" + self.network_config.IMAGE_EXTENSION, recursive=True)]
-        cropped_pure_images = [f for f in glob.glob(cropped_images_path + "**/gt*" + self.network_config.IMAGE_EXTENSION, recursive=True)]
+        cropped_noisy_images = [f for f in glob.glob(cropped_images_path + "/res*" + self.network_config.IMAGE_EXTENSION, recursive=False)]
+        cropped_ir_images = [f for f in glob.glob(cropped_images_path + "/left*" + self.network_config.IMAGE_EXTENSION, recursive=False)]
+        cropped_pure_images = [f for f in glob.glob(cropped_images_path + "/gt*" + self.network_config.IMAGE_EXTENSION, recursive=False)]
         cropped_images_list = [(cropped_noisy_images, "noisy"), (cropped_pure_images, "pure")]
 
         res = []
@@ -223,8 +223,8 @@ class SplitImage:
         ir_cropped_images_file = self.test_config.test_cropped_images_path + r'/' + 'left-' + str(cropped_images.split('-')[-1])
 
         cropped_w, cropped_h = self.test_config.test_img_width, self.test_config.test_img_height
-        im_files = [f for f in glob.glob(cropped_images + "**/res*", recursive=True)]
-        ir_im_files = [f for f in glob.glob(ir_cropped_images_file + "**/left*", recursive=True)]
+        im_files = [f for f in glob.glob(cropped_images + "/res*", recursive=False)]
+        ir_im_files = [f for f in glob.glob(ir_cropped_images_file + "/left*", recursive=False)]
 
         im_files.sort()
         ir_im_files.sort()
