@@ -68,11 +68,23 @@ class NetworkConfig:
 
 
 class TrainConfig(NetworkConfig):
-    def __init__(self, network_config, train_img_dir):
+    def __init__(self, network_config, train_img_dir, load_trained_model=0, load_model_name=""):
         NetworkConfig.__init__(self, network_config.TRAIN_DATA, network_config.TEST_DATA, network_config.DIFF_DATA, network_config.MODEL, network_config.CROP_DATA, network_config.epochs)
 
-        self.load_model_name = self.models_path + r"/DEPTH_20200910-203131.model"
-        self.LOAD_TRAINED_MODEL = 0 and self.TRAIN_DATA
+        self.load_model_name = load_model_name
+        self.LOAD_TRAINED_MODEL = load_trained_model and self.TRAIN_DATA
+
+        if self.LOAD_TRAINED_MODEL and load_model_name == "" and os.path.isdir(self.models_path):
+            # Find recent model
+            try:
+                models = sorted(glob.glob(os.path.join(self.models_path, '*/')), key=os.path.getmtime)[-1]
+                sub_dirs = next(os.walk(models))[1]
+                for dir in sub_dirs:
+                    if ".model" in dir:
+                        self.load_model_name = models+ dir
+                        break
+            except IndexError:
+                sys.exit("No Keras model was found! Add a model path to argument: --keras_model_path")
 
         self.train_images = self.images_path + r"/train"
         self.train_cropped_images_path = self.images_path + r"/train_cropped"

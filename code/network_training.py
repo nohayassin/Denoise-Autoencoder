@@ -66,9 +66,10 @@ class NetworkTraining:
                 images_num_to_process = all_cropped_num - i * images_num_to_process
             if self.train_config.LOAD_TRAINED_MODEL:
                 # create a dir where we want to copy and rename
-                save_model_name = self.train_config.load_model_name + '_new'
+                save_model_name = self.train_config.models_path + r"/" +os.path.basename(self.train_config.load_model_name) + "_new"
                 if not os.path.isdir(save_model_name):
                     shutil.copytree(self.train_config.load_model_name, save_model_name)
+                print('Training a trained model again, model name :', os.path.basename(self.train_config.load_model_name))
                 compiled_model = keras.models.load_model(save_model_name) # used to continue training old models
 
             noisy_input_train, pure_input_train  = self.image_config.image_to_array(first_image, images_num_to_process, self.train_config.train_cropped_images_path)
