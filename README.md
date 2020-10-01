@@ -61,11 +61,11 @@ so we can see last-layer features in the perspective of the layer above them.
 
 ### Ground Truth Depth Frames
 
-![foxdemo](images/3D-pure.PNG)
+![foxdemo](images/3D-pure.gif)
 
 ### Denoised Depth Frames
 The goal is to train the neural network so that denoised frames look as ground truth frames as possible.
-![foxdemo](images/3D-denoised.PNG)
+![foxdemo](images/3D-denoised.gif)
 
 
 ## Unet Network Training Evolution 
