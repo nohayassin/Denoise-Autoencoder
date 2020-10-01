@@ -61,11 +61,11 @@ so we can see last-layer features in the perspective of the layer above them.
 
 ### Ground Truth Depth Frames
 
-![foxdemo](https://github.com/nohayassin/RealSense-ML/blob/master/GAN/3D%20pure-%20100%20epochs%20-%20strides%20200%20-%20erosion%202%20-%20Binary%20-%20NO%20IR.gif)
+![foxdemo](images/3D-pure.PNG)
 
 ### Denoised Depth Frames
 The goal is to train the neural network so that denoised frames look as ground truth frames as possible.
-![foxdemo](https://github.com/nohayassin/RealSense-ML/blob/master/GAN/3D%20denoised-%20100%20epochs%20-%20strides%20200%20-%20erosion%202%20-%20Binary%20-%20NO%20IR.gif)
+![foxdemo](images/3D-denoised.PNG)
 
 
 ## Unet Network Training Evolution 
