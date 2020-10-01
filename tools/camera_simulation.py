@@ -86,7 +86,7 @@ def convert_image(i):
     M = np.max(i)
     i = np.divide(i, np.array([M - m], dtype=np.float)).astype(np.float)
     i = (i - m).astype(np.float)
-    i8 = (255.0 - i * 255.0).astype(np.uint8)
+    i8 = (i * 255.0).astype(np.uint8)
     if i8.ndim == 3:
         i8 = cv2.cvtColor(i8, cv2.COLOR_BGRA2GRAY)
     i8 = cv2.equalizeHist(i8)
@@ -130,6 +130,11 @@ try:
         t1 = time.perf_counter()
         depth_image = np.asanyarray(c.process(depth_frame).get_data())
         predicted_image = convert_image(predicted_image)
+
+        red = depth_image[:, :, 2].copy()
+        blue = depth_image[:, :, 0].copy()
+        depth_image[:, :, 0] = red
+        depth_image[:, :, 2] = blue
         images = np.hstack((depth_image, predicted_image))
 
         # Show images
