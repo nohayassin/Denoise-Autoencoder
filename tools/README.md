@@ -4,11 +4,11 @@
 
 
 ### Mark a line on image
-![foxdemo](https://github.com/nohayassin/RealSense-ML/blob/master/cross_section_img.PNG)
+![foxdemo](../images/cross_section_img.png)
 
 
 ### Pixels depth on a selected line
-![foxdemo](https://github.com/nohayassin/RealSense-ML/blob/master/cross_section_fig.PNG)
+![foxdemo](../images/cross_section_fig.PNG)
 
 
 # RMSE Tool
@@ -31,4 +31,15 @@ This tool runs on a folder that contains:
 The output is a bag file that could be opened by RealSense viewer.
 
 ![foxdemo](../images/conver_to_bag.PNG)
+
+# Camera Simulation
+Shows how to use a trained network in live simulation. Run this command :
+
+```py
+python camera_simulation.py <path to the model>
+```
+
+Expected output is the original frame and model prediction given it as an input. 
+
+![foxdemo](../images/camera_simulation_01.PNG)
 
