@@ -5,10 +5,10 @@ from network_testing import *
 from network_training import NetworkTraining
 from configurations import *
 
-def autoencoder(network_type, train, test, statistics, crop, train_img_dir, test_img_dir, keras_model_path, epochs, load_trained_model, load_model_name):
-    network_config = NetworkConfig(train=train, test=test, statistics=statistics, network_type=network_type, crop=crop, epochs=epochs)
-    train_config = TrainConfig(network_config, train_img_dir=train_img_dir, load_trained_model=load_trained_model, load_model_name=load_model_name)
-    image_processing = SplitImage(network_config, train_config, None)
+def autoencoder(network_type, train, test, statistics, crop, train_img_dir, test_img_dir, keras_model_path, epochs, convert_raw):
+    network_config = NetworkConfig(train=train, test=test, statistics=statistics, network_type=network_type, crop=crop, epochs=epochs, convert_raw=convert_raw)
+    train_config = TrainConfig(network_config, train_img_dir=train_img_dir)
+    image_processing = SplitImage(network_config, train_config, None, None)
 
     if network_config.MASK_PURE_DATA:
         image_processing.mask_pure_images(train_config.get_mask_pure_inputs())
@@ -19,6 +19,8 @@ def autoencoder(network_type, train, test, statistics, crop, train_img_dir, test
         image_processing.get_split_img(train_config.img_width, train_config.img_height)
 
     if network_config.CONVERT_RAW_TO_PNG:
+        real_data_config = RealDataConfig(network_config)
+        image_processing = SplitImage(network_config, None, None, real_data_config)
         image_processing.raw_to_png(848, 480)
 
     if network_config.TRAIN_DATA:
@@ -27,7 +29,7 @@ def autoencoder(network_type, train, test, statistics, crop, train_img_dir, test
 
     if network_config.TEST_DATA:
         test_config = TestConfig(network_config, keras_model_path=keras_model_path, test_img_dir=test_img_dir)
-        image_processing = SplitImage(network_config, None, test_config)
+        image_processing = SplitImage(network_config, None, test_config, None)
         network_test = NetworkTesting(test_config, image_processing)
         network_test.test()
 
@@ -48,7 +50,7 @@ if __name__ == '__main__':
     parser.add_argument("-t", "--test", action="store_true", help="test flag")
     parser.add_argument("-s", "--statistics", action="store_true", help="statistics flag")
     parser.add_argument("-c", "--crop", action="store_true", help="crop training images")
-    parser.add_argument("-l", "--load_model", action="store_true", help="load a model flag")
+    parser.add_argument("-r", "--convert_raw", action="store_true", help="convert raw to png")
 
     # nargs='?' : means 0-or-1 arguments
     # const=1 : sets the default when there are 0 arguments
@@ -57,7 +59,6 @@ if __name__ == '__main__':
     parser.add_argument('--train_path', nargs='?', const=1, default="", type=str, help="directory for training images")
     parser.add_argument('--test_path', nargs='?', const=1, default="", type=str, help="directory for images to test")
     parser.add_argument('--keras_model_path', nargs='?', const=1, default="", type=str, help="Keras model path")
-    parser.add_argument('--load_model_name', nargs='?', const=1, default="", type=str, help="directory of a trained model")
     args = parser.parse_args()
 
     print(args.train_path)
@@ -66,4 +67,4 @@ if __name__ == '__main__':
         if path: print("Test ", path, " ..")
         if path and not os.path.isdir(path):
             sys.exit("Invalid directory!")
-    autoencoder(UNET, args.train, args.test, args.statistics, args.crop, args.train_path, args.test_path, args.keras_model_path, args.epochs, args.load_model, args.load_model_name)
+    autoencoder(UNET, args.train, args.test, args.statistics, args.crop, args.train_path, args.test_path, args.keras_model_path, args.epochs, args.convert_raw)
