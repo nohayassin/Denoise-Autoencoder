@@ -52,7 +52,7 @@ knows only approximate location about where those features are.
 When we upsample we get the lost information back (by the concatination process)
 so we can see last-layer features in the perspective of the layer above them.
     
-![foxdemo](https://github.com/nohayassin/RealSense-ML/blob/master/images/u-net-architecture.png)
+![foxdemo](images/Unet.PNG)
 
 
 
@@ -75,15 +75,15 @@ Notice the improvement of Unet network learning process by:
 
 ### Ground Truth Depth Frame
 The target frame Unet network should reach
-![foxdemo](https://github.com/nohayassin/RealSense-ML/blob/master/images/GT-3D.PNG)
+![foxdemo](images/GT-3D.PNG)
 
 ### Noisy Depth Frame
 Depth frame as captured by DS5 camera (input to Unet network)
-![foxdemo](https://github.com/nohayassin/RealSense-ML/blob/master/images/noisy-3D.PNG)
+![foxdemo](images/noisy-3D.PNG)
 
 ### Denoised Depth Frame
 Output of Unet network after training on ground truth and noisy depth frame above
-![foxdemo](https://github.com/nohayassin/RealSense-ML/blob/master/images/Unet%20Evolution.gif)
+![foxdemo](images/Unet-Evolution.gif)
 
 
 ## Installation
