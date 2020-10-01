@@ -15,7 +15,7 @@
 ##### Same goal as cross section tool with more flexibility. It gives RMSE of pixels in a selected rectangle.
 ##### The Whiter the pixels, the more far they are. 
 ##### Smooth surface will result in homogeneous pixels color in the selected rectangle
-![foxdemo](https://github.com/nohayassin/RealSense-ML/blob/master/images/rmse_image.PNG)
+![foxdemo](../images/rmse.PNG)
 
 # Convert to Bag
 This tool runs on a folder that contains:
@@ -30,5 +30,5 @@ This tool runs on a folder that contains:
 	
 The output is a bag file that could be opened by RealSense viewer.
 
-![foxdemo](https://github.com/nohayassin/RealSense-ML/blob/master/images/conver_to_bag.PNG)
+![foxdemo](../images/conver_to_bag.PNG)
 
