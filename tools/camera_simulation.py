@@ -2,7 +2,6 @@ import pyrealsense2 as rs
 import numpy as np
 import cv2
 from tensorflow import keras
-from skimage import img_as_uint
 import time, sys
 
 # Configure depth and color streams
@@ -87,7 +86,7 @@ def convert_image(i):
     M = np.max(i)
     i = np.divide(i, np.array([M - m], dtype=np.float)).astype(np.float)
     i = (i - m).astype(np.float)
-    i8 = (i * 255.0).astype(np.uint8)
+    i8 = (255.0 - i * 255.0).astype(np.uint8)
     if i8.ndim == 3:
         i8 = cv2.cvtColor(i8, cv2.COLOR_BGRA2GRAY)
     i8 = cv2.equalizeHist(i8)
