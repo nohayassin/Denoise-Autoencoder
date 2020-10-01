@@ -6,30 +6,30 @@ import cv2
 from skimage import io as io2
 
 class SplitImage:
-    def __init__(self,network_config, train_config, test_config):
+    def __init__(self,network_config, train_config, test_config, real_data_config):
         self.network_config = network_config
         self.train_config = train_config
         self.test_config = test_config
+        self.real_data_config = real_data_config
 
     def raw_to_png(self, width, height):
 
-        filelist = [f for f in glob.glob(self.test_config.pngdir + "**/*.raw", recursive=True)]
-        self.network_config.clean_directory(self.test_config.noisy_pngoutdir)
-        self.network_config.clean_directory(self.test_config.ir_pngoutdir)
-        ir_count , noisy_count = 0, 0
+        filelist = [f for f in glob.glob(self.real_data_config.real_data + "**/*.raw", recursive=True)]
+        self.network_config.clean_directory(self.real_data_config.real_data_out)
+        #ir_count , noisy_count = 0, 0
         for f in filelist:
-            outDir = self.test_config.noisy_pngoutdir
+            outDir = self.real_data_config.real_data_out
             img = np.fromfile(f, dtype='uint16', sep="")
-            name, idx = "res-", noisy_count
+            #name, idx = "res-", noisy_count
+            name = os.path.basename(f).split('_')[0]
             if "Infrared" in f:
-                outDir = self.test_config.ir_pngoutdir
                 img = np.fromfile(f, dtype='uint8', sep="")
-                name, idx = "left-", ir_count
-                ir_count += 1
-            else:
-                noisy_count += 1
-            name = name + str(idx)
-            outfile = outDir + '/' + name + self.test_config.IMAGE_EXTENSION
+                #name, idx = "left-", ir_count
+                #ir_count += 1
+            #else:
+                #noisy_count += 1
+            #name = name + str(idx)
+            outfile = outDir + '/' + name + self.real_data_config.IMAGE_EXTENSION
             img = img.reshape([height, width])
             if "Infrared" in f:
                 img = img.astype('uint8')

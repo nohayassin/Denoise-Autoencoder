@@ -2,7 +2,7 @@ import os, sys, glob, shutil
 from pathlib import Path
 
 class NetworkConfig:
-    def __init__(self,train=0, test=0, statistics=0, network_type=0, crop=0, epochs=100):
+    def __init__(self,train=0, test=0, statistics=0, network_type=0, crop=0, epochs=100, convert_raw=0):
         # choose a relative path for files directory
         path = Path(os.path.abspath(os.getcwd()))
         self.root = str(path.parent.parent) + r"/autoencoder_files"
@@ -33,7 +33,7 @@ class NetworkConfig:
         self.OUTPUT_EQUALS_INPUT = 0 and self.TRAIN_DATA
         self.REMOVE_IR = 0 and self.TRAIN_DATA  # not relevant for now
         self.IMAGE_EXTENSION = '.png'
-        self.CONVERT_RAW_TO_PNG = 0
+        self.CONVERT_RAW_TO_PNG = convert_raw
 
         # other configuration
         self.channels = 2
@@ -68,23 +68,11 @@ class NetworkConfig:
 
 
 class TrainConfig(NetworkConfig):
-    def __init__(self, network_config, train_img_dir, load_trained_model=0, load_model_name=""):
+    def __init__(self, network_config, train_img_dir):
         NetworkConfig.__init__(self, network_config.TRAIN_DATA, network_config.TEST_DATA, network_config.DIFF_DATA, network_config.MODEL, network_config.CROP_DATA, network_config.epochs)
 
-        self.load_model_name = load_model_name
-        self.LOAD_TRAINED_MODEL = load_trained_model and self.TRAIN_DATA
-
-        if self.LOAD_TRAINED_MODEL and load_model_name == "" and os.path.isdir(self.models_path):
-            # Find recent model
-            try:
-                models = sorted(glob.glob(os.path.join(self.models_path, '*/')), key=os.path.getmtime)[-1]
-                sub_dirs = next(os.walk(models))[1]
-                for dir in sub_dirs:
-                    if ".model" in dir:
-                        self.load_model_name = models+ dir
-                        break
-            except IndexError:
-                sys.exit("No Keras model was found! Add a model path to argument: --keras_model_path")
+        self.load_model_name = self.models_path + r"/DEPTH_20200910-203131.model"
+        self.LOAD_TRAINED_MODEL = 0 and self.TRAIN_DATA
 
         self.train_images = self.images_path + r"/train"
         self.train_cropped_images_path = self.images_path + r"/train_cropped"
@@ -122,8 +110,10 @@ class TestConfig(NetworkConfig):
         self.test_images = self.images_path + r"/test"
         self.test_cropped_images_path = self.images_path + r"/test_cropped"
         self.denoised_dir = self.images_path + r"/denoised"
+        self.real_data = self.images_path + r"/real_data"
+        self.real_data_out = self.images_path + r"/real_data_out"
         self.paths = [self.test_images, self.test_cropped_images_path, self.denoised_dir]
-        self.pngdir = self.images_path + r"/real_data"
+
 
         print("Creating folders for testing process ..")
         self.create_folders()
@@ -131,6 +121,18 @@ class TestConfig(NetworkConfig):
         if test_img_dir is not "" and (os.path.abspath(test_img_dir) is not os.path.abspath(self.root)):
             self.clean_directory(self.test_images)
             self.copytree(src=test_img_dir, dst=self.test_images)
+
+class RealDataConfig(NetworkConfig):
+    def __init__(self, network_config):
+        NetworkConfig.__init__(self, network_config.TRAIN_DATA, network_config.TEST_DATA, network_config.DIFF_DATA,
+                               network_config.MODEL, network_config.CROP_DATA, network_config.epochs)
+
+        self.real_data = self.images_path + r"/real_data"
+        self.real_data_out = self.images_path + r"/real_data_out"
+        self.paths = [self.real_data,self.real_data_out]
+
+        print("Creating folders for real data ..")
+        self.create_folders()
 
 class StatisticsConfig(TestConfig):
     def __init__(self, network_config, test_config):
