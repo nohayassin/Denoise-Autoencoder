@@ -107,10 +107,11 @@ Pass the directories to autoencoder.py using relevant arguments. If no directori
 
 Set flag -c for images cropping only if you have new training images.
 
-    usage: Denoise Autoencoder Parser [-h] [-n] [-t] [-s] [-c]
-                                      [--train_path [TRAIN_PATH]]
-                                      [--test_path [TEST_PATH]]
-                                      [--keras_model_path [KERAS_MODEL_PATH]]
+    usage: Denoise Autoencoder Parser [-h] [-n] [-t] [-s] [-c] [-r]
+                                  [--epochs [EPOCHS]]
+                                  [--train_path [TRAIN_PATH]]
+                                  [--test_path [TEST_PATH]]
+                                  [--keras_model_path [KERAS_MODEL_PATH]]
 
     optional arguments:
       -h, --help            show this help message and exit
@@ -118,10 +119,13 @@ Set flag -c for images cropping only if you have new training images.
       -t, --test            test flag
       -s, --statistics      statistics flag
       -c, --crop            crop training images
+      -r, --convert_raw     convert raw to png
       --epochs [EPOCHS]     epochs number
-      --train_path [TRAIN_PATH] training images directory
-      --test_path [TEST_PATH]  testing images directory
-      --keras_model_path [KERAS_MODEL_PATH]  Keras model path
+      --train_path [TRAIN_PATH]
+                            directory for training images
+      --test_path [TEST_PATH]
+                            directory for images to test
+      --keras_model_path [KERAS_MODEL_PATH] Keras model path
                     
 
 ## Usage Examples
